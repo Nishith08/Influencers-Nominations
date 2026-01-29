@@ -62,7 +62,6 @@ function App() {
                     razorpay_signature: response.razorpay_signature,
                     bookingId: data.bookingId
                 });
-
                 if (verifyRes.data.status === 'success') {
                     alert("Payment Successful! Booking Confirmed.");
                     // Reset form after success
