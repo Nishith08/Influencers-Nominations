@@ -43,7 +43,6 @@ const sendConfirmationEmail = async (bookingData) => {
     doc.text('---------------------------------------------------');
     doc.moveDown();
     doc.text('Thank you for booking with us!', { align: 'center' });
-
     doc.end(); // Finish PDF generation
 
     // C. Wait for PDF to finish, then send email
