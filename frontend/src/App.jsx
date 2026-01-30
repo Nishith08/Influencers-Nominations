@@ -42,19 +42,18 @@ function App() {
 
     try {
       // Step A: Ask Backend to create an order
-      // Note: Ensure port 5000 is correct for your backend
       const { data } = await axios.post('http://localhost:5000/api/create-order', { members });
 
       // Step B: Configure Razorpay Popup options
       const options = {
-        key: "rzp_test_S9FRgtlnopEMKP", // <--- REPLACE THIS WITH YOUR TEST KEY ID (Start with rzp_test_)
+        key: "rzp_test_S9FRgtlnopEMKP", 
         amount: data.amount, 
         currency: "INR",
         name: "Mahi Event Booking",
         description: "Holi Event Entry",
-        order_id: data.orderId, // This comes from backend
+        order_id: data.orderId, 
         handler: async function (response) {
-            // Step C: If user pays successfully, verify it on backend
+            // Step C: Verify on backend
             try {
                 const verifyRes = await axios.post('http://localhost:5000/api/verify-payment', {
                     razorpay_order_id: response.razorpay_order_id,
@@ -64,7 +63,6 @@ function App() {
                 });
                 if (verifyRes.data.status === 'success') {
                     alert("Payment Successful! Booking Confirmed.");
-                    // Reset form after success
                     setMembers([{ name: '', phone: '', email: '', age: '', gender: 'Male' }]);
                 }
             } catch (err) {
@@ -94,11 +92,17 @@ function App() {
   // Helper to calculate total price
   const calculateTotal = () => {
     return members.reduce((total, member) => {
-      // If age is empty or less than/equal to 3, price is 0. Otherwise 2.
       const price = (member.age && member.age > 3) ? 2 : 0;
       return total + price;
     }, 0);
   };
+
+ // --- NEW VALIDATION LOGIC ---
+  // Check if ALL members have an age entered, and ALL of them are <= 3
+  const isSingleChildError = members.length > 0 && members.every(member => 
+    member.age !== '' && Number(member.age) <= 3
+  );
+  // --- NEW VALIDATION LOGIC END ---
 
   return (
     <div className="container">
@@ -154,21 +158,41 @@ function App() {
         </button>
       </div>
 
-      <div className="checkout-bar">
-        <div className="total-display">
-            <span>Total Members: {members.length}</span>
-            <span className="price">₹{calculateTotal()}</span>
+      <div className="checkout-bar" style={{ flexDirection: 'column', gap: '10px' }}>
+        
+        {/* --- ERROR MESSAGE DISPLAY --- */}
+        {isSingleChildError && (
+            <div style={{ 
+                backgroundColor: '#ffeaea', 
+                border: '1px solid red', 
+                color: '#d63031', 
+                padding: '10px', 
+                borderRadius: '5px', 
+                width: '100%', 
+                textAlign: 'center',
+                fontWeight: 'bold'
+            }}>
+                A child under the age of 3 cannot be booked alone.
+            </div>
+        )}
+
+        <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center' }}>
+            <div className="total-display">
+                <span>Total Members: {members.length}</span>
+                <span className="price">₹{calculateTotal()}</span>
+            </div>
+            <button 
+                className="pay-btn" 
+                onClick={handlePayment} 
+                /* Disable button if loading OR if the error exists */
+                disabled={isLoading || isSingleChildError}
+                style={{ opacity: isSingleChildError ? 0.5 : 1, cursor: isSingleChildError ? 'not-allowed' : 'pointer' }}
+            >
+                {isLoading ? "Processing..." : "Proceed to Pay"}
+            </button>
         </div>
-        <button 
-            className="pay-btn" 
-            onClick={handlePayment} 
-            disabled={isLoading}
-        >
-            {isLoading ? "Processing..." : "Proceed to Pay"}
-        </button>
       </div>
     </div>
   );
 }
-
 export default App;
