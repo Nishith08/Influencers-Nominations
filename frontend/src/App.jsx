@@ -91,6 +91,15 @@ function App() {
     }
   };
 
+  // Helper to calculate total price
+  const calculateTotal = () => {
+    return members.reduce((total, member) => {
+      // If age is empty or less than/equal to 3, price is 0. Otherwise 2.
+      const price = (member.age && member.age > 3) ? 2 : 0;
+      return total + price;
+    }, 0);
+  };
+
   return (
     <div className="container">
       <header className="header">
@@ -148,7 +157,7 @@ function App() {
       <div className="checkout-bar">
         <div className="total-display">
             <span>Total Members: {members.length}</span>
-            <span className="price">₹{members.length * 1}</span>
+            <span className="price">₹{calculateTotal()}</span>
         </div>
         <button 
             className="pay-btn" 

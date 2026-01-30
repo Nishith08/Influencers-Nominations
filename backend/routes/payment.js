@@ -10,29 +10,43 @@ const razorpay = new Razorpay({
 });
 
 // 1. Create Order
+// 1. Create Order
 router.post('/create-order', async (req, res) => {
   try {
     const { members } = req.body;
-    const amount = members.length * 1 * 100; // 500 INR per person (in paisa)
+
+    // OLD LOGIC: const amount = members.length * 500 * 100;
+    
+    // NEW LOGIC: Calculate amount based on age
+    let totalAmount = 0;
+    members.forEach(member => {
+      if (member.age > 3) {
+        totalAmount += 2;
+      }
+    });
+
+    // Convert to paisa (multiply by 100)
+    const amountInPaisa = totalAmount * 100;
 
     const options = {
-      amount: amount,
+      amount: amountInPaisa,
       currency: "INR",
       receipt: "receipt_" + Date.now(),
     };
 
     const order = await razorpay.orders.create(options);
 
-    // Save to DB as Pending
+    // Save to DB
     const newBooking = new Booking({
       members,
-      totalAmount: amount / 100,
+      totalAmount: totalAmount, // Save the actual calculated amount
       razorpayOrderId: order.id,
     });
     await newBooking.save();
 
-    res.json({ orderId: order.id, amount: amount, bookingId: newBooking._id });
+    res.json({ orderId: order.id, amount: amountInPaisa, bookingId: newBooking._id });
   } catch (error) {
+    console.error(error);
     res.status(500).send(error);
   }
 });
