@@ -107,15 +107,20 @@ function App() {
   return (
     <div className="container">
       <header className="header">
-        <h1>🎉 Mahi Event Booking (Holi)</h1>
-        <p>Add details for all members joining the event.</p>
+        <div className="logo">
+          <img src="/MAHI_LOGO.png" alt="Mahi Logo" width="80" height="80" />
+        </div>
+        <h1 className="holi-title">
+          <span>H</span><span>o</span><span>l</span><span>i</span><span>&nbsp;</span><span>P</span><span>a</span><span>r</span><span>t</span><span>y</span>
+        </h1>
+        <p>Book Your Tickets Now</p>
       </header>
 
       <div className="form-wrapper">
         {members.map((member, index) => (
           <div key={index} className="member-card">
             <div className="card-header">
-                <h3>Member #{index + 1}</h3>
+                <h3>Member : {index + 1}</h3>
                 {members.length > 1 && (
                     <button className="remove-btn" onClick={() => removeMember(index)}>X</button>
                 )}
@@ -158,25 +163,16 @@ function App() {
         </button>
       </div>
 
-      <div className="checkout-bar" style={{ flexDirection: 'column', gap: '10px' }}>
+      <div className="checkout-bar">
         
         {/* --- ERROR MESSAGE DISPLAY --- */}
         {isSingleChildError && (
-            <div style={{ 
-                backgroundColor: '#ffeaea', 
-                border: '1px solid red', 
-                color: '#d63031', 
-                padding: '10px', 
-                borderRadius: '5px', 
-                width: '100%', 
-                textAlign: 'center',
-                fontWeight: 'bold'
-            }}>
+            <div className="error-message">
                 A child under the age of 3 cannot be booked alone.
             </div>
         )}
 
-        <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center' }}>
+        <div className="bottom-row">
             <div className="total-display">
                 <span>Total Members: {members.length}</span>
                 <span className="price">₹{calculateTotal()}</span>
@@ -186,7 +182,6 @@ function App() {
                 onClick={handlePayment} 
                 /* Disable button if loading OR if the error exists */
                 disabled={isLoading || isSingleChildError}
-                style={{ opacity: isSingleChildError ? 0.5 : 1, cursor: isSingleChildError ? 'not-allowed' : 'pointer' }}
             >
                 {isLoading ? "Processing..." : "Proceed to Pay"}
             </button>
