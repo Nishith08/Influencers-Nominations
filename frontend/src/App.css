@@ -353,3 +353,72 @@ input::placeholder, select::placeholder {
     font-size: 16px;
   }
 }
+
+/* --- ORGANIZATIONAL TREE CSS --- */
+.tree {
+    overflow-x: auto; /* Allow scrolling if tree gets wide */
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+}
+
+.tree ul {
+    padding-top: 20px; 
+    position: relative;
+    display: flex;
+    justify-content: center;
+}
+
+.tree li {
+    float: left; text-align: center;
+    list-style-type: none;
+    position: relative;
+    padding: 20px 5px 0 5px; /* Spacing between nodes */
+}
+
+/* Connecting Lines (Up/Horizontal) */
+.tree li::before, .tree li::after {
+    content: ''; 
+    position: absolute; top: 0; right: 50%;
+    border-top: 2px solid #3498db; /* Blue Line */
+    width: 50%; height: 20px;
+}
+.tree li::after {
+    right: auto; left: 50%;
+    border-left: 2px solid #3498db;
+}
+
+/* Remove connectors from single/first/last children */
+.tree li:only-child::after, .tree li:only-child::before { display: none; }
+.tree li:only-child { padding-top: 0; }
+.tree li:first-child::before, .tree li:last-child::after { border: 0 none; }
+
+/* Add back the vertical line for single last child */
+.tree li:last-child::before{
+    border-right: 2px solid #3498db;
+    border-radius: 0 5px 0 0;
+}
+.tree li:first-child::after{
+    border-radius: 5px 0 0 0;
+}
+
+/* Vertical line down from parent */
+.tree ul ul::before {
+    content: '';
+    position: absolute; top: 0; left: 50%;
+    border-left: 2px solid #3498db;
+    width: 0; height: 20px;
+}
+
+/* The Node Card Design */
+.node-card {
+    border: 2px solid #3498db;
+    padding: 10px 15px;
+    display: inline-block;
+    border-radius: 5px;
+    background: white;
+    color: #333;
+    font-weight: bold;
+    min-width: 80px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
