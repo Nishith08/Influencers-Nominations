@@ -6,68 +6,86 @@ const jwt = require('jsonwebtoken');
 
 // 1. IMPORT THE MODEL (Crucial Step - likely missing or wrong path)
 const Influencer = require('../models/Influencer');
+const InviteToken = require('../models/InviteToken');
 
 // --- REGISTER ROUTE (With Debug Logs) ---
 router.post('/register', async (req, res) => {
-  console.log("1. Registration Request Received:", req.body);
+ try {
+    const { 
+      name, phone, email, age, gender, instagram, youtube, otherLinks, 
+      inviteToken,   // MODE A: From Admin Link (One-time)
+      referralToken  // MODE B: From Sub-Influencer Link (Max 2)
+    } = req.body;
 
-  try {
-    const { name, phone, email, age, gender, instagram, youtube, otherLinks, referralToken } = req.body;
-
-    // A. Check if Influencer model is loaded
-    if (!Influencer) {
-        throw new Error("Influencer Model is not imported correctly!");
-    }
-
-    // B. Check if email exists
-    const existing = await Influencer.findOne({ email });
-    console.log("2. Email Check Complete. Exists?", !!existing);
-    
-    if (existing) {
-        return res.status(400).json({ message: "Email already registered" });
-    }
-
-    // C. Handle Referral Logic
     let parentId = null;
-    // Only check referral if token is NOT null and NOT empty
-    if (referralToken && referralToken !== "null") {
-      console.log("3. Checking Referral Token:", referralToken);
-      const parent = await Influencer.findOne({ referralToken });
-      
-      if (!parent) return res.status(400).json({ message: "Invalid Referral Link" });
-      if (parent.referralCount >= 2) return res.status(400).json({ message: "This referral link has reached its limit (2/2)" });
+    let validInviteDoc = null; // To track if we need to mark an invite as used
 
-      parentId = parent._id;
-      parent.referralCount += 1;
-      await parent.save();
+    // --- LOGIC BRANCHING ---
+
+    // SCENARIO A: Registration via ADMIN INVITE (One-Time)
+    if (inviteToken) {
+        validInviteDoc = await InviteToken.findOne({ token: inviteToken });
+        
+        if (!validInviteDoc) {
+            return res.status(400).json({ message: "Invalid Admin Invite Link." });
+        }
+        if (validInviteDoc.isUsed) {
+            return res.status(400).json({ message: "This invite link has already been used." });
+        }
+    } 
+    // SCENARIO B: Registration via PEER REFERRAL (Max 2)
+    else if (referralToken) {
+        const parent = await Influencer.findOne({ referralToken });
+        
+        if (!parent) {
+            return res.status(400).json({ message: "Invalid Referral Link." });
+        }
+        if (parent.referralCount >= 2) {
+            return res.status(400).json({ message: "This referrer has reached their limit (2/2)." });
+        }
+        
+        parentId = parent._id; // Set the parent for the tree
+    } 
+    // SCENARIO C: No Token Provided
+    else {
+        return res.status(400).json({ message: "Registration requires a valid Invite or Referral link." });
     }
 
-    // D. Generate Password
-    const autoPassword = Math.random().toString(36).slice(-8);
-    console.log("4. Password Generated:", autoPassword);
+    // --- COMMON REGISTRATION LOGIC ---
+    
+    // 1. Check if email exists
+    const existing = await Influencer.findOne({ email });
+    if (existing) return res.status(400).json({ message: "Email already registered" });
 
-    // E. Create Influencer
+    // 2. Create User
+    const autoPassword = Math.random().toString(36).slice(-8);
     const newInfluencer = new Influencer({
       name, phone, email, age, gender, instagram, youtube, otherLinks,
       password: autoPassword,
-      referredBy: parentId
+      referredBy: parentId // Will be null for Admin Invites, ID for Referrals
     });
 
-    console.log("5. Saving to Database...");
     await newInfluencer.save();
-    console.log("6. SAVED SUCCESSFULLY!");
 
-    res.json({ 
-      message: "Registration Successful!", 
-      generatedPassword: autoPassword 
-    });
+    // --- POST-SAVE UPDATES ---
+
+    // If it was an Admin Invite, mark it as used
+    if (validInviteDoc) {
+        validInviteDoc.isUsed = true;
+        await validInviteDoc.save();
+    }
+
+    // If it was a Referral, increment the parent's count
+    if (parentId) {
+        await Influencer.findByIdAndUpdate(parentId, { $inc: { referralCount: 1 } });
+    }
+
+    res.json({ message: "Registration Successful!", generatedPassword: autoPassword });
 
   } catch (error) {
-    console.error("!!! CRASH ERROR !!!", error); // Check terminal for this
     res.status(500).json({ error: error.message });
   }
 });
-
 // --- LOGIN ROUTE ---
 router.post('/login', async (req, res) => {
   try {

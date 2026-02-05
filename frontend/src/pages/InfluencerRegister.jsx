@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import axios from 'axios';
 import { useParams } from 'react-router-dom';
 
-const InfluencerRegister = () => {
-  const { token } = useParams(); // Get token from URL /influencers/:token
+const InfluencerRegister = ({ mode }) => { // <--- Receive 'mode' prop
+  const { token } = useParams(); 
+  
   const [formData, setFormData] = useState({
     name: '', phone: '', email: '', age: '', gender: 'Male',
     instagram: '', youtube: '', otherLinks: ''
@@ -14,10 +15,19 @@ const InfluencerRegister = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const payload = { ...formData, referralToken: token || null }; // Attach token if exists
+      // DYNAMIC PAYLOAD CREATION
+      const payload = { ...formData };
+
+      if (mode === 'invite') {
+          payload.inviteToken = token;    // Send as Admin Invite
+          payload.referralToken = null;
+      } else {
+          payload.referralToken = token;  // Send as Peer Referral
+          payload.inviteToken = null;
+      }
+      
       const res = await axios.post('http://localhost:5000/api/influencer/register', payload);
       
-      // Show the generated password
       alert(`Registration Successful!\n\nYOUR PASSWORD IS: ${res.data.generatedPassword}\n\nPlease save this password to login.`);
       window.location.href = '/influencers/login';
       
@@ -28,7 +38,19 @@ const InfluencerRegister = () => {
 
   return (
     <div className="container">
-      <h2>Influencer Registration {token && "(Referral Mode)"}</h2>
+      <h2>Influencer Registration</h2>
+      
+      {/* Visual Feedback based on Mode */}
+      {mode === 'invite' ? (
+        <p style={{ fontSize: '14px', color: '#8e44ad', fontWeight: 'bold' }}>
+           🚀 Joining via Admin Invite
+        </p>
+      ) : (
+        <p style={{ fontSize: '14px', color: '#2980b9', fontWeight: 'bold' }}>
+           🔗 Joining via Referral Link
+        </p>
+      )}
+
       <form onSubmit={handleSubmit}>
         <input name="name" placeholder="Name" required onChange={handleChange} />
         <input name="phone" placeholder="Phone" required onChange={handleChange} />

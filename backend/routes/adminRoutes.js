@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const crypto = require('crypto');
 const Influencer = require('../models/Influencer');
-
+const InviteToken = require('../models/InviteToken'); // Import new model
 // 1. Get All Influencers
 router.get('/influencers', async (req, res) => {
   try {
@@ -63,4 +63,22 @@ router.get('/full-tree', async (req, res) => {
   } catch (err) { res.status(500).send(err.message); }
 });
 
+// 4. Generate One-Time Invite Link
+router.post('/generate-invite', async (req, res) => {
+  try {
+    // Generate a random unique string
+    const token = crypto.randomBytes(16).toString('hex');
+
+    // Save to DB
+    const newInvite = new InviteToken({ token });
+    await newInvite.save();
+
+    // Send back the full link (adjust localhost port if needed)
+    const link = `http://localhost:5173/influencers/register/${token}`;
+    res.json({ link, token });
+
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 module.exports = router;
