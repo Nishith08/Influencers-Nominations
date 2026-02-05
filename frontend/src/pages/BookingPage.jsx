@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import '../App.css'; // Note the ".." to go up one folder to find App.css
+import Footer from '../components/Footer';
+
 
 function BookingPage() { 
     // 1. State to hold the list of members
@@ -105,6 +107,7 @@ function BookingPage() {
       // --- NEW VALIDATION LOGIC END ---
     
       return (
+        <>
         <div className="container">
           <header className="header">
             <div className="logo">
@@ -188,6 +191,8 @@ function BookingPage() {
             </div>
           </div>
         </div>
+        <Footer />
+        </>
       );
 }
 
