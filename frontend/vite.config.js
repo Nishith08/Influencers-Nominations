@@ -10,6 +10,6 @@ export default defineConfig({
     // '__FRONTEND_URL__': JSON.stringify('http://localhost:5173'),
     // '__BACKEND_URL__': JSON.stringify('http://localhost:5000') 
     '__FRONTEND_URL__': JSON.stringify('https://holi.navjeevan.ac.in'),
-    '__BACKEND_URL__': JSON.stringify('https://holi.navjeevan.ac.in/api') 
+    '__BACKEND_URL__': JSON.stringify('https://holi.navjeevan.ac.in') 
   }
 })
