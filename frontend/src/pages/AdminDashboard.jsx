@@ -7,12 +7,13 @@ const AdminDashboard = () => {
   const [showTree, setShowTree] = useState(false);
   const [fullTreeData, setFullTreeData] = useState([]);
   
-  // --- NEW STATE FOR INVITE LINK ---
+  // --- STATE FOR INVITE LINK ---
   const [inviteLink, setInviteLink] = useState("");
 
   // 1. Fetch List
   const fetchInfluencers = async () => {
     try {
+      // Assuming __BACKEND_URL__ is defined in your vite.config.js
       const res = await axios.get(`${__BACKEND_URL__}/api/admin/influencers`);
       setInfluencers(res.data);
     } catch (err) {
@@ -33,8 +34,8 @@ const AdminDashboard = () => {
 
   // 3. Secure Logout Function
   const handleLogout = () => {
-    localStorage.clear(); // Wipe all data
-    window.location.replace('/influencers/login'); // Redirect and replace history
+    localStorage.clear(); 
+    window.location.replace('/influencers/login'); 
   };
 
   // 4. Generate Invite Link Function
@@ -43,7 +44,7 @@ const AdminDashboard = () => {
         const res = await axios.post(`${__BACKEND_URL__}/api/admin/generate-invite`);
         setInviteLink(res.data.link);
     } catch (err) {
-        alert("Failed to generate link. Is the backend running?");
+        alert("Failed to generate link.");
     }
   };
 
@@ -61,7 +62,8 @@ const AdminDashboard = () => {
   };
 
   return (
-    <div className="container" style={{maxWidth: '1000px'}}>
+    <div className="container" style={{maxWidth: '1200px'}}> {/* Increased width for more columns */}
+      
       {/* --- HEADER SECTION --- */}
       <div style={{display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:'20px'}}>
           <h2>Admin Dashboard</h2>
@@ -76,61 +78,32 @@ const AdminDashboard = () => {
 
             <button 
                 onClick={handleLogout}
-                style={{ 
-                    padding:'10px', 
-                    background:'#ff4d4d', 
-                    color:'white', 
-                    border:'none', 
-                    borderRadius:'5px', 
-                    cursor:'pointer',
-                    fontWeight: 'bold'
-                }}
+                style={{ padding:'10px', background:'#ff4d4d', color:'white', border:'none', borderRadius:'5px', cursor:'pointer', fontWeight: 'bold' }}
             >
                 Logout
             </button>
           </div>
       </div>
 
-      {/* --- NEW INVITE SECTION --- */}
-      <div style={{ 
-          background: 'white', padding: '20px', borderRadius: '10px', 
-          marginBottom: '20px', boxShadow: '0 2px 5px rgba(0,0,0,0.1)',
-          textAlign: 'center', border: '1px solid #eee'
-      }}>
+      {/* --- INVITE SECTION --- */}
+      <div style={{ background: 'white', padding: '20px', borderRadius: '10px', marginBottom: '20px', boxShadow: '0 2px 5px rgba(0,0,0,0.1)', textAlign: 'center', border: '1px solid #eee' }}>
           <h3 style={{ marginTop: 0 }}>🚀 Invite New Influencer</h3>
           <p style={{ color: '#666', fontSize: '14px' }}>Generate a secure, one-time use registration link for a new root influencer.</p>
           
           {!inviteLink ? (
-              <button 
-                onClick={generateLink} 
-                style={{ background: '#8e44ad', color: 'white', padding: '10px 20px', border: 'none', borderRadius: '5px', cursor: 'pointer', fontSize:'16px', fontWeight:'bold' }}
-              >
+              <button onClick={generateLink} style={{ background: '#8e44ad', color: 'white', padding: '10px 20px', border: 'none', borderRadius: '5px', cursor: 'pointer', fontSize:'16px', fontWeight:'bold' }}>
                   Generate Invite Link
               </button>
           ) : (
               <div style={{ marginTop: '15px', display: 'flex', justifyContent: 'center', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
-                  <input 
-                    readOnly 
-                    value={inviteLink} 
-                    style={{ padding: '10px', width: '350px', border: '1px solid #ccc', borderRadius: '5px', background: '#f9f9f9' }}
-                  />
-                  <button 
-                    onClick={copyToClipboard}
-                    style={{ background: '#27ae60', color: 'white', padding: '10px 15px', border: 'none', borderRadius: '5px', cursor: 'pointer' }}
-                  >
-                      Copy Link
-                  </button>
-                  <button 
-                    onClick={() => setInviteLink("")} // Clear to generate another
-                    style={{ background: 'transparent', border:'none', color:'#888', cursor:'pointer', textDecoration:'underline', fontSize: '14px' }}
-                  >
-                      Reset
-                  </button>
+                  <input readOnly value={inviteLink} style={{ padding: '10px', width: '350px', border: '1px solid #ccc', borderRadius: '5px', background: '#f9f9f9' }} />
+                  <button onClick={copyToClipboard} style={{ background: '#27ae60', color: 'white', padding: '10px 15px', border: 'none', borderRadius: '5px', cursor: 'pointer' }}>Copy Link</button>
+                  <button onClick={() => setInviteLink("")} style={{ background: 'transparent', border:'none', color:'#888', cursor:'pointer', textDecoration:'underline', fontSize: '14px' }}>Reset</button>
               </div>
           )}
       </div>
 
-      {/* --- MAIN CONTENT (TREE OR TABLE) --- */}
+      {/* --- MAIN CONTENT --- */}
       {showTree ? (
         <div style={{ textAlign: 'center' }}>
             <h3>Full Influencer Network</h3>
@@ -139,12 +112,18 @@ const AdminDashboard = () => {
             </div>
         </div>
       ) : (
-        <div style={{ overflowX: 'auto' }}>
-            <table border="1" style={{width:'100%', borderCollapse:'collapse', background: 'white'}}>
+        <div style={{ overflowX: 'auto', borderRadius: '8px', boxShadow: '0 0 10px rgba(0,0,0,0.05)' }}>
+            <table border="1" style={{width:'100%', borderCollapse:'collapse', background: 'white', fontSize: '14px'}}>
                 <thead>
-                    <tr style={{ background: '#f4f4f4' }}>
+                    <tr style={{ background: '#f4f4f4', whiteSpace: 'nowrap' }}>
                         <th style={{ padding: '10px' }}>Name</th>
+                        <th style={{ padding: '10px' }}>Phone</th>
                         <th style={{ padding: '10px' }}>Email</th>
+                        <th style={{ padding: '10px' }}>Age</th>
+                        <th style={{ padding: '10px' }}>Gender</th>
+                        <th style={{ padding: '10px' }}>Instagram</th>
+                        <th style={{ padding: '10px' }}>YouTube</th>
+                        <th style={{ padding: '10px' }}>Other</th>
                         <th style={{ padding: '10px' }}>Referred By</th>
                         <th style={{ padding: '10px' }}>Status</th>
                         <th style={{ padding: '10px' }}>Actions</th>
@@ -154,27 +133,50 @@ const AdminDashboard = () => {
                     {influencers.map(inf => (
                         <tr key={inf._id} style={{ textAlign: 'center' }}>
                             <td style={{ padding: '10px' }}>{inf.name}</td>
+                            <td style={{ padding: '10px' }}>{inf.phone}</td>
                             <td style={{ padding: '10px' }}>{inf.email}</td>
+                            <td style={{ padding: '10px' }}>{inf.age}</td>
+                            <td style={{ padding: '10px' }}>{inf.gender}</td>
+                            
+                            {/* Social Links */}
+                            <td style={{ padding: '10px' }}>
+                                <a href={inf.instagram} target="_blank" rel="noopener noreferrer" style={{color: '#E1306C', fontWeight:'bold', textDecoration:'none'}}>View</a>
+                            </td>
+                            <td style={{ padding: '10px' }}>
+                                {inf.youtube ? 
+                                    <a href={inf.youtube} target="_blank" rel="noopener noreferrer" style={{color: 'red', fontWeight:'bold', textDecoration:'none'}}>View</a> 
+                                : '-'}
+                            </td>
+                            <td style={{ padding: '10px' }}>
+                                {inf.otherLinks ? 
+                                    <a href={inf.otherLinks} target="_blank" rel="noopener noreferrer" style={{color: 'blue', textDecoration:'underline'}}>View</a> 
+                                : '-'}
+                            </td>
+
                             <td style={{ padding: '10px' }}>{inf.referredBy?.name || 'Direct'}</td>
+                            
+                            {/* Status Badge */}
                             <td style={{ padding: '10px' }}>
                                 <span style={{ 
                                     padding: '5px 10px', borderRadius: '15px', 
                                     background: inf.status === 'Accepted' ? '#d4edda' : inf.status === 'Rejected' ? '#f8d7da' : '#fff3cd',
                                     color: inf.status === 'Accepted' ? '#155724' : inf.status === 'Rejected' ? '#721c24' : '#856404',
-                                    fontWeight: 'bold', fontSize: '12px'
+                                    fontWeight: 'bold', fontSize: '11px', textTransform: 'uppercase'
                                 }}>
                                     {inf.status}
                                 </span>
                             </td>
-                            <td style={{ padding: '10px' }}>
+
+                            {/* Actions */}
+                            <td style={{ padding: '10px', whiteSpace: 'nowrap' }}>
                                 {inf.status === 'Pending' && (
                                     <>
-                                        <button onClick={() => updateStatus(inf._id, 'Accepted')} style={{background:'green', color:'white', border:'none', padding:'5px 10px', borderRadius:'3px', cursor:'pointer', marginRight:'5px'}}>Accept</button>
-                                        <button onClick={() => updateStatus(inf._id, 'Rejected')} style={{background:'red', color:'white', border:'none', padding:'5px 10px', borderRadius:'3px', cursor:'pointer'}}>Reject</button>
+                                        <button onClick={() => updateStatus(inf._id, 'Accepted')} style={{background:'green', color:'white', border:'none', padding:'5px 10px', borderRadius:'3px', cursor:'pointer', marginRight:'5px'}}>✓</button>
+                                        <button onClick={() => updateStatus(inf._id, 'Rejected')} style={{background:'red', color:'white', border:'none', padding:'5px 10px', borderRadius:'3px', cursor:'pointer'}}>✕</button>
                                     </>
                                 )}
-                                {inf.status === 'Accepted' && <span style={{ color: 'green' }}>✅</span>}
-                                {inf.status === 'Rejected' && <span style={{ color: 'red' }}>❌</span>}
+                                {inf.status === 'Accepted' && <span style={{ color: 'green', fontSize:'18px' }}>✅</span>}
+                                {inf.status === 'Rejected' && <span style={{ color: 'red', fontSize:'18px' }}>❌</span>}
                             </td>
                         </tr>
                     ))}
