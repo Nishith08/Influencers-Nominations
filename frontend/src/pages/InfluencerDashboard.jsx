@@ -29,7 +29,7 @@ const InfluencerDashboard = () => {
 
       try {
         // 1. Fetch User Profile Live from DB
-        const userRes = await axios.get('http://localhost:5000/api/influencer/me', {
+        const userRes = await axios.get(`${__BACKEND_URL__}/api/influencer/me`, {
           headers: { Authorization: token }
         });
         
@@ -38,7 +38,7 @@ const InfluencerDashboard = () => {
 
         // 2. If Accepted, Fetch Tree Data
         if (userData.status === 'Accepted') {
-          const treeRes = await axios.get('http://localhost:5000/api/influencer/my-tree', {
+          const treeRes = await axios.get(`${__BACKEND_URL__}/api/influencer/my-tree`, {
             headers: { Authorization: token }
           });
           setTreeData(treeRes.data);
@@ -64,7 +64,7 @@ const InfluencerDashboard = () => {
   if (loading) return <div>Loading Profile...</div>;
   if (!user) return <div>Access Denied</div>;
 
-  const referralLink = `http://localhost:5173/influencers/${user.referralToken}`;
+  const referralLink = `${__FRONTEND_URL__}/influencers/${user.referralToken}`;
 
   return (
     <div className="container">

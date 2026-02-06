@@ -26,7 +26,7 @@ const InfluencerRegister = ({ mode }) => { // <--- Receive 'mode' prop
           payload.inviteToken = null;
       }
       
-      const res = await axios.post('http://localhost:5000/api/influencer/register', payload);
+      const res = await axios.post(`${__BACKEND_URL__}/api/influencer/register`, payload);
       
       alert(`Registration Successful!\n\nYOUR PASSWORD IS: ${res.data.generatedPassword}\n\nPlease save this password to login.`);
       window.location.href = '/influencers/login';

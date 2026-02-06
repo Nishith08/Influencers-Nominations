@@ -13,7 +13,7 @@ const AdminDashboard = () => {
   // 1. Fetch List
   const fetchInfluencers = async () => {
     try {
-      const res = await axios.get('http://localhost:5000/api/admin/influencers');
+      const res = await axios.get(`${__BACKEND_URL__}/api/admin/influencers`);
       setInfluencers(res.data);
     } catch (err) {
       console.error("Error fetching list:", err);
@@ -23,7 +23,7 @@ const AdminDashboard = () => {
   // 2. Fetch Tree
   const fetchFullTree = async () => {
     try {
-        const res = await axios.get('http://localhost:5000/api/admin/full-tree');
+        const res = await axios.get(`${__BACKEND_URL__}/api/admin/full-tree`);
         setFullTreeData(res.data);
         setShowTree(true);
     } catch (err) {
@@ -40,7 +40,7 @@ const AdminDashboard = () => {
   // 4. Generate Invite Link Function
   const generateLink = async () => {
     try {
-        const res = await axios.post('http://localhost:5000/api/admin/generate-invite');
+        const res = await axios.post(`${__BACKEND_URL__}/api/admin/generate-invite`);
         setInviteLink(res.data.link);
     } catch (err) {
         alert("Failed to generate link. Is the backend running?");
@@ -56,7 +56,7 @@ const AdminDashboard = () => {
   useEffect(() => { fetchInfluencers(); }, []);
 
   const updateStatus = async (id, status) => {
-    await axios.put(`http://localhost:5000/api/admin/influencers/${id}/status`, { status });
+    await axios.put(`${__BACKEND_URL__}/api/admin/influencers/${id}/status`, { status });
     fetchInfluencers();
   };
 

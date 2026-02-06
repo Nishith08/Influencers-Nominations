@@ -7,7 +7,7 @@ const InfluencerLogin = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post('http://localhost:5000/api/influencer/login', creds);
+      const res = await axios.post(`${__BACKEND_URL__}/api/influencer/login`, creds);
       localStorage.setItem('token', res.data.token);
      
       

@@ -44,7 +44,7 @@ function BookingPage() {
     
         try {
           // Step A: Ask Backend to create an order
-          const { data } = await axios.post('http://localhost:5000/api/create-order', { members });
+          const { data } = await axios.post(`${__BACKEND_URL__}/api/create-order`, { members });
     
           // Step B: Configure Razorpay Popup options
           const options = {
@@ -57,7 +57,7 @@ function BookingPage() {
             handler: async function (response) {
                 // Step C: Verify on backend
                 try {
-                    const verifyRes = await axios.post('http://localhost:5000/api/verify-payment', {
+                    const verifyRes = await axios.post(`${__BACKEND_URL__}/api/verify-payment`, {
                         razorpay_order_id: response.razorpay_order_id,
                         razorpay_payment_id: response.razorpay_payment_id,
                         razorpay_signature: response.razorpay_signature,

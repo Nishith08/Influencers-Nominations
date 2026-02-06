@@ -3,6 +3,7 @@ const router = express.Router();
 const crypto = require('crypto');
 const Influencer = require('../models/Influencer');
 const InviteToken = require('../models/InviteToken'); // Import new model
+const { linkSync } = require('fs');
 // 1. Get All Influencers
 router.get('/influencers', async (req, res) => {
   try {
@@ -72,9 +73,10 @@ router.post('/generate-invite', async (req, res) => {
     // Save to DB
     const newInvite = new InviteToken({ token });
     await newInvite.save();
-
+const baseUrl = process.env.CLIENT_URL || 'http://localhost:5173';
     // Send back the full link (adjust localhost port if needed)
-    const link = `http://localhost:5173/influencers/register/${token}`;
+    const link = `${baseUrl}/influencers/register/${token}`;
+    //console.log("Generated Invite Link:", link);
     res.json({ link, token });
 
   } catch (err) {
