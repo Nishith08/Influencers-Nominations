@@ -9,7 +9,7 @@ export default defineConfig({
     // NOTE: You must JSON.stringify strings so they are treated as code values
     // '__FRONTEND_URL__': JSON.stringify('http://localhost:5173'),
     // '__BACKEND_URL__': JSON.stringify('http://localhost:5000') 
-    '__FRONTEND_URL__': JSON.stringify('https://holi.navjeevan.ac.in'),
-    '__BACKEND_URL__': JSON.stringify('https://holi.navjeevan.ac.in') 
+    '__FRONTEND_URL__': JSON.stringify('https://holi.sigmainternationalschool.com'),
+    '__BACKEND_URL__': JSON.stringify('https://holi.sigmainternationalschool.com') 
   }
 })

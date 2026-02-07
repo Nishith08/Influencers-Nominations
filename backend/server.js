@@ -1,8 +1,8 @@
 require('dotenv').config();
 const express = require('express');
+const path = require('path');
 const mongoose = require('mongoose');
 const cors = require('cors');
-const path = require('path');
 const paymentRoutes = require('./routes/payment');
 
 const app = express();
@@ -25,11 +25,11 @@ app.use('/api/admin', require('./routes/adminRoutes'));
 app.use(express.static(path.join(__dirname, 'dist')));
 
 // 2. Catch-all route: If a request isn't an API call, send the React app
-app.get('*', (req, res) => {
+app.get(/(.*)/, (req, res) => {
   res.sendFile(path.join(__dirname, 'dist', 'index.html'));
 });
 
 
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
