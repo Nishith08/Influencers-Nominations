@@ -11,6 +11,7 @@ const influencerSchema = new mongoose.Schema({
   
   // Social Links
   instagram: { type: String, required: true },
+  profilePic: { type: String, required: true },
   youtube: { type: String }, // Optional
   otherLinks: { type: String }, // Optional
 

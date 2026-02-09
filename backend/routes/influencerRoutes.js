@@ -3,27 +3,55 @@ const router = express.Router();
 const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const multer = require('multer');
+const path = require('path');
+const fs = require('fs'); // <--- 1. CRITICAL MISSING IMPORT
 
-// 1. IMPORT THE MODEL (Crucial Step - likely missing or wrong path)
+// Import Models
 const Influencer = require('../models/Influencer');
 const InviteToken = require('../models/InviteToken');
 
-// --- REGISTER ROUTE (With Debug Logs) ---
-router.post('/register', async (req, res) => {
- try {
+// --- MULTER CONFIGURATION (Safe Mode) ---
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    const dir = 'uploads/';
+    
+    // 2. CRITICAL SAFETY CHECK: Create folder if it doesn't exist
+    if (!fs.existsSync(dir)){
+        fs.mkdirSync(dir, { recursive: true });
+    }
+    
+    cb(null, dir);
+  },
+  filename: function (req, file, cb) {
+    // Saves file as: timestamp + original extension (e.g., 17099988-profile.jpg)
+    cb(null, Date.now() + path.extname(file.originalname));
+  }
+});
+
+const upload = multer({ storage: storage });
+
+// --- REGISTER ROUTE ---
+router.post('/register', upload.single('profilePic'), async (req, res) => {
+  try {
+    // 3. VALIDATE FILE UPLOAD
+    if (!req.file) {
+        return res.status(400).json({ message: "Profile Picture is required." });
+    }
+
     const { 
       name, phone, email, age, gender, instagram, youtube, otherLinks, 
-      inviteToken,   // MODE A: From Admin Link (One-time)
-      referralToken  // MODE B: From Sub-Influencer Link (Max 2)
+      inviteToken,   // MODE A
+      referralToken  // MODE B
     } = req.body;
 
     let parentId = null;
-    let validInviteDoc = null; // To track if we need to mark an invite as used
+    let validInviteDoc = null; 
 
     // --- LOGIC BRANCHING ---
 
-    // SCENARIO A: Registration via ADMIN INVITE (One-Time)
-    if (inviteToken) {
+    // SCENARIO A: Registration via ADMIN INVITE
+    if (inviteToken && inviteToken !== 'null') {
         validInviteDoc = await InviteToken.findOne({ token: inviteToken });
         
         if (!validInviteDoc) {
@@ -33,8 +61,8 @@ router.post('/register', async (req, res) => {
             return res.status(400).json({ message: "This invite link has already been used." });
         }
     } 
-    // SCENARIO B: Registration via PEER REFERRAL (Max 2)
-    else if (referralToken) {
+    // SCENARIO B: Registration via PEER REFERRAL
+    else if (referralToken && referralToken !== 'null') {
         const parent = await Influencer.findOne({ referralToken });
         
         if (!parent) {
@@ -44,7 +72,7 @@ router.post('/register', async (req, res) => {
             return res.status(400).json({ message: "This referrer has reached their limit (2/2)." });
         }
         
-        parentId = parent._id; // Set the parent for the tree
+        parentId = parent._id; 
     } 
     // SCENARIO C: No Token Provided
     else {
@@ -53,29 +81,27 @@ router.post('/register', async (req, res) => {
 
     // --- COMMON REGISTRATION LOGIC ---
     
-    // 1. Check if email exists
     const existing = await Influencer.findOne({ email });
     if (existing) return res.status(400).json({ message: "Email already registered" });
 
-    // 2. Create User
     const autoPassword = Math.random().toString(36).slice(-8);
+    
     const newInfluencer = new Influencer({
       name, phone, email, age, gender, instagram, youtube, otherLinks,
       password: autoPassword,
-      referredBy: parentId // Will be null for Admin Invites, ID for Referrals
+      referredBy: parentId,     
+      profilePic: req.file.filename // <--- SAVE FILENAME
     });
 
     await newInfluencer.save();
 
     // --- POST-SAVE UPDATES ---
 
-    // If it was an Admin Invite, mark it as used
     if (validInviteDoc) {
         validInviteDoc.isUsed = true;
         await validInviteDoc.save();
     }
 
-    // If it was a Referral, increment the parent's count
     if (parentId) {
         await Influencer.findByIdAndUpdate(parentId, { $inc: { referralCount: 1 } });
     }
@@ -83,9 +109,11 @@ router.post('/register', async (req, res) => {
     res.json({ message: "Registration Successful!", generatedPassword: autoPassword });
 
   } catch (error) {
+    console.error("Register Error:", error); // Helpful for debugging
     res.status(500).json({ error: error.message });
   }
 });
+
 // --- LOGIN ROUTE ---
 router.post('/login', async (req, res) => {
   try {
@@ -94,15 +122,15 @@ router.post('/login', async (req, res) => {
 
     if (!user) return res.status(404).json({ message: "User not found" });
 
-    // Check Password
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) return res.status(400).json({ message: "Invalid credentials" });
 
-    // Generate Token
     const token = jwt.sign({ id: user._id, role: user.role }, "SECRET_KEY_123");
 
+    // 4. UPDATE: Send profilePic so frontend can display it immediately
     res.json({ token, user: { 
-      id: user._id, name: user.name, status: user.status, referralToken: user.referralToken, role: user.role 
+      id: user._id, name: user.name, status: user.status, referralToken: user.referralToken, role: user.role,
+      profilePic: user.profilePic 
     }});
 
   } catch (error) {
@@ -119,13 +147,14 @@ router.get('/my-tree', async (req, res) => {
     const decoded = jwt.verify(token, "SECRET_KEY_123");
     const userId = decoded.id;
 
-    const allInfluencers = await Influencer.find({ status: 'Accepted' }).select('name _id referredBy');
+    const allInfluencers = await Influencer.find({ status: 'Accepted' }).select('name _id referredBy profilePic'); // Added profilePic here too just in case
 
     const buildTree = (parentId) => {
       const children = allInfluencers.filter(inf => String(inf.referredBy) === String(parentId));
       if (children.length === 0) return null;
       return children.map(child => ({
         name: child.name,
+        profilePic: child.profilePic, // Pass it to the tree
         children: buildTree(child._id)
       }));
     };
@@ -137,14 +166,15 @@ router.get('/my-tree', async (req, res) => {
     res.status(500).send(error.message);
   }
 });
-// --- 4. GET MY PROFILE (New Route) ---
+
+// --- GET MY PROFILE (For Dashboard) ---
 router.get('/me', async (req, res) => {
   const token = req.headers.authorization;
   if (!token) return res.status(401).json({ message: "No token provided" });
 
   try {
-    const decoded = jwt.verify(token, "SECRET_KEY_123"); // Ensure key matches your login route
-    const user = await Influencer.findById(decoded.id).select('-password'); // Don't send password
+    const decoded = jwt.verify(token, "SECRET_KEY_123");
+    const user = await Influencer.findById(decoded.id).select('-password'); 
     
     if (!user) return res.status(404).json({ message: "User not found" });
     

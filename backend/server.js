@@ -16,6 +16,7 @@ mongoose.connect(process.env.MONGO_URI)
   .catch(err => console.log(err));
 
   // --- API ROUTES (Keep these BEFORE the frontend code) ---
+app.use('/uploads', express.static('uploads'));
 app.use('/api', paymentRoutes);
 app.use('/api/influencer', require('./routes/influencerRoutes'));
 app.use('/api/admin', require('./routes/adminRoutes'));
