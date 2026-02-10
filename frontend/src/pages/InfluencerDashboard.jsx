@@ -7,10 +7,13 @@ const InfluencerDashboard = () => {
   const [treeData, setTreeData] = useState([]);
   const [loading, setLoading] = useState(true);
   
-  // --- NEW STATE FOR DROPDOWN & MODAL ---
+  // --- STATE FOR DROPDOWN & MODAL ---
   const [showDropdown, setShowDropdown] = useState(false);
   const [showProfileModal, setShowProfileModal] = useState(false);
   const dropdownRef = useRef(null);
+
+  // --- NEW STATE FOR 3D TREE MODE ---
+  const [showTreeMode, setShowTreeMode] = useState(false);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -76,33 +79,33 @@ const InfluencerDashboard = () => {
         {/* Profile Icon Wrapper */}
         <div ref={dropdownRef} style={{ position: 'relative' }}>
             <div 
-        onClick={() => setShowDropdown(!showDropdown)}
-        style={{
-            width: '50px', height: '50px', borderRadius: '50%', 
-            backgroundColor: '#3498db', color: 'white',
-            display: 'flex', justifyContent: 'center', alignItems: 'center',
-            fontSize: '20px', fontWeight: 'bold', cursor: 'pointer',
-            boxShadow: '0 2px 5px rgba(0,0,0,0.2)',
-            overflow: 'hidden', // Crucial: clips square image to circle
-            border: '2px solid white'
-        }}
-    >
-        {user.profilePic ? (
-            <img 
-                src={`${__BACKEND_URL__}/uploads/${user.profilePic}`} 
-                alt="Profile"
-                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                onError={(e) => { 
-                    // Fallback: If image fails to load, hide image and show initial
-                    e.target.style.display = 'none'; 
-                    e.target.parentElement.innerText = user.name.charAt(0).toUpperCase();
-                }} 
-            />
-        ) : (
-            // Fallback: Show Initial if no picture data exists
-            <span>{user.name.charAt(0).toUpperCase()}</span>
-        )}
-    </div>
+                onClick={() => setShowDropdown(!showDropdown)}
+                style={{
+                    width: '50px', height: '50px', borderRadius: '50%', 
+                    backgroundColor: '#3498db', color: 'white',
+                    display: 'flex', justifyContent: 'center', alignItems: 'center',
+                    fontSize: '20px', fontWeight: 'bold', cursor: 'pointer',
+                    boxShadow: '0 2px 5px rgba(0,0,0,0.2)',
+                    overflow: 'hidden', // Crucial: clips square image to circle
+                    border: '2px solid white'
+                }}
+            >
+                {user.profilePic ? (
+                    <img 
+                        src={`${__BACKEND_URL__}/uploads/${user.profilePic}`} 
+                        alt="Profile"
+                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                        onError={(e) => { 
+                            // Fallback: If image fails to load, hide image and show initial
+                            e.target.style.display = 'none'; 
+                            e.target.parentElement.innerText = user.name.charAt(0).toUpperCase();
+                        }} 
+                    />
+                ) : (
+                    // Fallback: Show Initial if no picture data exists
+                    <span>{user.name.charAt(0).toUpperCase()}</span>
+                )}
+            </div>
 
             {/* Dropdown Menu */}
             {showDropdown && (
@@ -153,14 +156,42 @@ const InfluencerDashboard = () => {
         )}
       </div>
 
-      {/* --- TREE VIEW --- */}
+      {/* --- TREE VIEW SECTION --- */}
       {user.status === 'Accepted' && (
         <div style={{ marginTop: '20px' }}>
-            <h2>My Network Tree</h2>
-            <div style={{ border: '1px solid #eee', borderRadius: '10px', padding: '10px', overflowX: 'auto' }}>
-                <NetworkTree data={treeData} />
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+                <h2>My Network Tree</h2>
+                {/* 3D TOGGLE BUTTON */}
+                <button 
+                    onClick={() => {
+                  if (treeData && treeData.length > 0) {
+                    setShowTreeMode(true);
+                  } else {
+                    alert("Your network galaxy is loading or empty!");
+                  }
+                }}
+                    style={{ 
+                        padding: '10px 20px', background: '#8e44ad', color: 'white', 
+                        border: 'none', borderRadius: '5px', cursor: 'pointer', fontWeight: 'bold' 
+                    }}
+                >
+                    🌍 View Influencer Network
+                </button>
+            </div>
+            
+            {/* Standard 2D or List View (Placeholder or existing logic if any) */}
+            <div style={{ padding: '20px', background: '#fff', border: '1px solid #eee', borderRadius: '10px', textAlign: 'center', color: '#777' }}>
+                <p>Click the button above to explore your connection galaxy in 3D!</p>
             </div>
         </div>
+      )}
+
+      {/* --- FULL SCREEN 3D TREE --- */}
+      {showTreeMode && (
+          <NetworkTree 
+            data={treeData} 
+            onClose={() => setShowTreeMode(false)} 
+          />
       )}
 
       {/* --- PROFILE MODAL --- */}
@@ -182,24 +213,47 @@ const InfluencerDashboard = () => {
                 
                 <h2 style={{ textAlign: 'center', marginBottom: '20px', borderBottom: '2px solid #3498db', paddingBottom: '10px' }}>My Profile</h2>
                 
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                    <p><strong>Name:</strong> {user.name}</p>
-                    <p><strong>Email:</strong> {user.email}</p>
-                    <p><strong>Phone:</strong> {user.phone}</p>
-                    <p><strong>Age:</strong> {user.age}</p>
-                    <p><strong>Gender:</strong> {user.gender}</p>
-                    
-                    <hr style={{ width: '100%', border: '0', borderTop: '1px solid #eee', margin: '10px 0' }} />
-                    
-                    <p><strong>Instagram:</strong> <a href={user.instagram} target="_blank" rel="noopener noreferrer" style={{color: '#E1306C'}}>View Profile</a></p>
-                    
-                    {user.youtube && (
-                        <p><strong>YouTube:</strong> <a href={user.youtube} target="_blank" rel="noopener noreferrer" style={{color: 'red'}}>View Channel</a></p>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', alignItems: 'center' }}>
+                     {/* Large Profile Picture in Modal */}
+                    {user.profilePic ? (
+                        <img 
+                            src={`${__BACKEND_URL__}/uploads/${user.profilePic}`} 
+                            alt="Profile"
+                            style={{ 
+                                width: '100px', height: '100px', borderRadius: '50%', 
+                                objectFit: 'cover', border: '3px solid #3498db', marginBottom: '10px' 
+                            }}
+                        />
+                    ) : (
+                        <div style={{ 
+                            width: '100px', height: '100px', borderRadius: '50%', 
+                            background: '#3498db', color: 'white', display: 'flex', 
+                            justifyContent: 'center', alignItems: 'center', fontSize: '40px', 
+                            fontWeight: 'bold', marginBottom: '10px'
+                        }}>
+                            {user.name.charAt(0).toUpperCase()}
+                        </div>
                     )}
-                    
-                    {user.otherLinks && (
-                        <p><strong>Other Links:</strong> <a href={user.otherLinks} target="_blank" rel="noopener noreferrer">View Link</a></p>
-                    )}
+
+                    <div style={{ width: '100%', textAlign: 'left' }}>
+                        <p><strong>Name:</strong> {user.name}</p>
+                        <p><strong>Email:</strong> {user.email}</p>
+                        <p><strong>Phone:</strong> {user.phone}</p>
+                        <p><strong>Age:</strong> {user.age}</p>
+                        <p><strong>Gender:</strong> {user.gender}</p>
+                        
+                        <hr style={{ width: '100%', border: '0', borderTop: '1px solid #eee', margin: '10px 0' }} />
+                        
+                        <p><strong>Instagram:</strong> <a href={user.instagram} target="_blank" rel="noopener noreferrer" style={{color: '#E1306C'}}>View Profile</a></p>
+                        
+                        {user.youtube && (
+                            <p><strong>YouTube:</strong> <a href={user.youtube} target="_blank" rel="noopener noreferrer" style={{color: 'red'}}>View Channel</a></p>
+                        )}
+                        
+                        {user.otherLinks && (
+                            <p><strong>Other Links:</strong> <a href={user.otherLinks} target="_blank" rel="noopener noreferrer">View Link</a></p>
+                        )}
+                    </div>
                 </div>
 
                 <button 

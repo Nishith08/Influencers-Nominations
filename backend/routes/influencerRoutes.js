@@ -138,7 +138,36 @@ router.post('/login', async (req, res) => {
   }
 });
 
-// --- GET TREE ROUTE ---
+// // --- GET TREE ROUTE ---
+// router.get('/my-tree', async (req, res) => {
+//   const token = req.headers.authorization;
+//   if(!token) return res.status(401).send("Unauthorized");
+  
+//   try {
+//     const decoded = jwt.verify(token, "SECRET_KEY_123");
+//     const userId = decoded.id;
+
+//     const allInfluencers = await Influencer.find({ status: 'Accepted' }).select('name _id referredBy profilePic'); // Added profilePic here too just in case
+
+//     const buildTree = (parentId) => {
+//       const children = allInfluencers.filter(inf => String(inf.referredBy) === String(parentId));
+//       if (children.length === 0) return null;
+//       return children.map(child => ({
+//         name: child.name,
+//         profilePic: child.profilePic, // Pass it to the tree
+//         children: buildTree(child._id)
+//       }));
+//     };
+
+//     const tree = buildTree(userId);
+//     res.json(tree || []);
+
+//   } catch (error) {
+//     res.status(500).send(error.message);
+//   }
+// });
+
+// --- GET TREE ROUTE (Fixed: Always includes the User as Root) ---
 router.get('/my-tree', async (req, res) => {
   const token = req.headers.authorization;
   if(!token) return res.status(401).send("Unauthorized");
@@ -147,20 +176,41 @@ router.get('/my-tree', async (req, res) => {
     const decoded = jwt.verify(token, "SECRET_KEY_123");
     const userId = decoded.id;
 
-    const allInfluencers = await Influencer.find({ status: 'Accepted' }).select('name _id referredBy profilePic'); // Added profilePic here too just in case
+    // 1. Fetch CURRENT USER with profilePic
+    const currentUser = await Influencer.findById(userId).select('name _id role profilePic');
 
+    // 2. Fetch ALL ACCEPTED influencers with profilePic
+    const allInfluencers = await Influencer.find({ status: 'Accepted' })
+        .select('name _id referredBy profilePic role'); // <--- ADDED profilePic
+
+    // 3. Recursive Builder
     const buildTree = (parentId) => {
       const children = allInfluencers.filter(inf => String(inf.referredBy) === String(parentId));
-      if (children.length === 0) return null;
+      
+      if (children.length === 0) return [];
+      
       return children.map(child => ({
         name: child.name,
-        profilePic: child.profilePic, // Pass it to the tree
+        role: child.role || 'Member',
+        profilePic: child.profilePic, // <--- Pass it here
+        _id: child._id,
         children: buildTree(child._id)
       }));
     };
 
-    const tree = buildTree(userId);
-    res.json(tree || []);
+    // 4. Build Tree
+    const childrenNodes = buildTree(userId);
+
+    // 5. Construct Final Tree (Root + Children)
+    const myTree = [{
+        name: currentUser.name,
+        role: "Me",
+        profilePic: currentUser.profilePic, // <--- Ensure Root has it
+        _id: currentUser._id,
+        children: childrenNodes
+    }];
+
+    res.json(myTree);
 
   } catch (error) {
     res.status(500).send(error.message);

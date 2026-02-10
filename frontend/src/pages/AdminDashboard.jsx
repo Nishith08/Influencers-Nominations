@@ -108,7 +108,9 @@ const AdminDashboard = () => {
         <div style={{ textAlign: 'center' }}>
             <h3>Full Influencer Network</h3>
             <div style={{ background:'#f9f9f9', padding:'20px', borderRadius:'10px', overflowX: 'auto' }}>
-                <NetworkTree data={fullTreeData} />
+                <NetworkTree 
+                data={fullTreeData}
+                onClose={() => setShowTree(false)} />
             </div>
         </div>
       ) : (

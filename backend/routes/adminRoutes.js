@@ -33,35 +33,69 @@ router.put('/influencers/:id/status', async (req, res) => {
 });
 
 // 3. Get Full Network Tree (For Admin)
+// router.get('/full-tree', async (req, res) => {
+//   try {
+//     // Fetch only Accepted influencers
+//     const allInfluencers = await Influencer.find({ status: 'Accepted' }).select('name _id referredBy');
+
+//     // Recursive Build Function
+//     const buildTree = (parentId) => {
+//       const children = allInfluencers.filter(inf => String(inf.referredBy) === String(parentId));
+//       if (children.length === 0) return null;
+      
+//       return children.map(child => ({
+//         name: child.name,
+//         children: buildTree(child._id)
+//       }));
+//     };
+
+//     // Find "Roots" (Influencers who have NO parent, or their parent is not in the list)
+//     // In a perfect system, referredBy is null. But sometimes parent is rejected/deleted.
+//     const roots = allInfluencers.filter(inf => 
+//         !inf.referredBy || !allInfluencers.find(p => String(p._id) === String(inf.referredBy))
+//     );
+
+//     const fullTree = roots.map(root => ({
+//         name: root.name,
+//         children: buildTree(root._id)
+//     }));
+
+//     res.json(fullTree);
+//   } catch (err) { res.status(500).send(err.message); }
+// });
+
+// 3. Get Full Network Tree (For Admin)
 router.get('/full-tree', async (req, res) => {
   try {
-    // Fetch only Accepted influencers
-    const allInfluencers = await Influencer.find({ status: 'Accepted' }).select('name _id referredBy');
+    // 1. Fetch ALL influencers with profilePic
+    const influencers = await Influencer.find({})
+      .select('name _id referredBy profilePic role email status'); // <--- ADDED profilePic
 
-    // Recursive Build Function
+    // 2. Build Tree Recursively
     const buildTree = (parentId) => {
-      const children = allInfluencers.filter(inf => String(inf.referredBy) === String(parentId));
-      if (children.length === 0) return null;
-      
+      const children = influencers.filter(inf => 
+        // Handle root nodes (null parent) vs children
+        parentId === null ? !inf.referredBy : String(inf.referredBy) === String(parentId)
+      );
+
+      if (children.length === 0) return [];
+
       return children.map(child => ({
         name: child.name,
+        role: child.role || 'Member',
+        profilePic: child.profilePic, // <--- Pass it to frontend
+        _id: child._id,
         children: buildTree(child._id)
       }));
     };
 
-    // Find "Roots" (Influencers who have NO parent, or their parent is not in the list)
-    // In a perfect system, referredBy is null. But sometimes parent is rejected/deleted.
-    const roots = allInfluencers.filter(inf => 
-        !inf.referredBy || !allInfluencers.find(p => String(p._id) === String(inf.referredBy))
-    );
+    // Start with influencers who have NO referrer (Roots)
+    const tree = buildTree(null);
+    res.json(tree);
 
-    const fullTree = roots.map(root => ({
-        name: root.name,
-        children: buildTree(root._id)
-    }));
-
-    res.json(fullTree);
-  } catch (err) { res.status(500).send(err.message); }
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 // 4. Generate One-Time Invite Link
