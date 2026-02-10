@@ -12,14 +12,39 @@ const InfluencerRegister = ({ mode }) => {
 
   const [profilePic, setProfilePic] = useState(null);
   
-  // --- NEW STATE FOR SUCCESS MODAL ---
+  // State for Success Modal
   const [showModal, setShowModal] = useState(false);
   const [generatedPass, setGeneratedPass] = useState("");
 
   const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
 
+  // --- UPDATED FILE HANDLER WITH VALIDATION ---
   const handleFileChange = (e) => {
-    setProfilePic(e.target.files[0]);
+    const file = e.target.files[0];
+
+    // 1. If no file selected (user clicked cancel)
+    if (!file) return;
+
+    // 2. Validate File Type (MIME check)
+    const validTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/webp'];
+    if (!validTypes.includes(file.type)) {
+        alert("❌ Invalid File Type! Please upload an image (JPG, PNG, or WEBP).");
+        e.target.value = null; // Clear the input
+        setProfilePic(null);
+        return;
+    }
+
+    // 3. Validate File Size (5MB Limit)
+    const maxSize = 5 * 1024 * 1024; // 5MB in bytes
+    if (file.size > maxSize) {
+        alert("❌ File too large! Please choose an image less than 5MB.");
+        e.target.value = null; // Clear the input
+        setProfilePic(null);
+        return;
+    }
+
+    // 4. If valid, set the state
+    setProfilePic(file);
   };
 
   const handleSubmit = async (e) => {
@@ -45,7 +70,6 @@ const InfluencerRegister = ({ mode }) => {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
       
-      // --- SUCCESS: SHOW MODAL INSTEAD OF ALERT ---
       setGeneratedPass(res.data.generatedPassword);
       setShowModal(true);
       
@@ -55,13 +79,11 @@ const InfluencerRegister = ({ mode }) => {
     }
   };
 
-  // --- COPIES PASSWORD TO CLIPBOARD ---
   const copyToClipboard = () => {
     navigator.clipboard.writeText(generatedPass);
-    alert("Password copied to clipboard!"); // Small feedback
+    alert("Password copied to clipboard!");
   };
 
-  // --- REDIRECTS TO LOGIN ---
   const goToLogin = () => {
     window.location.href = '/influencers/login';
   };
@@ -87,11 +109,24 @@ const InfluencerRegister = ({ mode }) => {
             </select>
         </div>
         
-        <div style={{ margin: '10px 0', textAlign: 'left' }}>
-            <label style={{ fontSize: '14px', color: '#555', display: 'block', marginBottom: '5px' }}>
+        {/* --- UPDATED PROFILE PICTURE INPUT SECTION --- */}
+        <div style={{ margin: '15px 0', textAlign: 'left', background: '#f9f9f9', padding: '10px', borderRadius: '5px', border: '1px dashed #ccc' }}>
+            <label style={{ fontSize: '14px', color: '#333', display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
                 Profile Picture <span style={{color:'red'}}>*</span>
             </label>
-            <input type="file" accept="image/*" required onChange={handleFileChange} style={{ padding: '5px' }} />
+            
+            <input 
+                type="file" 
+                accept="image/png, image/jpeg, image/jpg, image/webp" 
+                required 
+                onChange={handleFileChange} 
+                style={{ padding: '5px', width: '100%' }} 
+            />
+            
+            {/* Visual Requirement Text */}
+            <p style={{ fontSize: '12px', color: '#777', marginTop: '5px', margin: 0 }}>
+                ℹ️ <strong>Requirements:</strong> Images only (JPG, PNG). Max Size: <strong>5MB</strong>.
+            </p>
         </div>
 
         <input name="instagram" placeholder="Instagram Link (Required)" required onChange={handleChange} />
@@ -103,7 +138,7 @@ const InfluencerRegister = ({ mode }) => {
         <button type="submit" className="pay-btn">Register</button>
       </form>
 
-      {/* --- SUCCESS MODAL OVERLAY --- */}
+      {/* --- SUCCESS MODAL --- */}
       {showModal && (
         <div style={{
             position: 'fixed', top: 0, left: 0, width: '100%', height: '100%',
@@ -119,7 +154,6 @@ const InfluencerRegister = ({ mode }) => {
                 <h3 style={{ color: 'green', margin: '0 0 10px 0' }}>Registration Successful!</h3>
                 <p style={{ color: '#555', fontSize: '14px' }}>Please save your secure password below to login.</p>
                 
-                {/* PASSWORD BOX */}
                 <div style={{
                     background: '#f4f4f4', padding: '15px', borderRadius: '8px',
                     border: '1px dashed #aaa', margin: '20px 0', fontWeight: 'bold', fontSize: '18px', letterSpacing: '1px'
@@ -127,7 +161,6 @@ const InfluencerRegister = ({ mode }) => {
                     {generatedPass}
                 </div>
 
-                {/* BUTTONS */}
                 <div style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>
                     <button 
                         onClick={copyToClipboard}
