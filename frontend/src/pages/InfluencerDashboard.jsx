@@ -73,7 +73,7 @@ const InfluencerDashboard = () => {
     <div className="container">
       
       {/* --- HEADER WITH PROFILE DROPDOWN --- */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', position: 'relative' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', position: 'relative', color: '#333' }}>
         <h1>Welcome, {user.name}</h1>
         
         {/* Profile Icon Wrapper */}
@@ -130,7 +130,7 @@ const InfluencerDashboard = () => {
                         onMouseOver={(e) => e.target.style.background = '#fff5f5'}
                         onMouseOut={(e) => e.target.style.background = 'white'}
                     >
-                        🚪 Logout
+                        🔴 Logout
                     </div>
                 </div>
             )}
@@ -138,7 +138,7 @@ const InfluencerDashboard = () => {
       </div>
       
       {/* --- STATUS CARD --- */}
-      <div style={{ padding: '20px', background: '#f4f4f4', borderRadius: '8px', marginBottom:'20px' }}>
+      <div style={{ padding: '20px', background: '#f4f4f4', borderRadius: '8px', marginBottom:'20px', color: '#333', boxShadow: '0 2px 5px rgba(0,0,0,0.1)', border: '1px solid #eee' }}>
         <h3>Application Status: 
             <span style={{ 
                 color: user.status === 'Accepted' ? 'green' : user.status === 'Rejected' ? 'red' : 'orange', 
@@ -159,8 +159,8 @@ const InfluencerDashboard = () => {
       {/* --- TREE VIEW SECTION --- */}
       {user.status === 'Accepted' && (
         <div style={{ marginTop: '20px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
-                <h2>My Network Tree</h2>
+            <div style={{ display: 'flex', justifyContent: 'space-between', padding:'0 15px' , alignItems: 'center', marginBottom: '10px', color: '#333', background: '#ffffff47', borderRadius: '13px', border: '1px solid #eee', boxShadow: 'inset 1px 2px 8px rgba(255, 255, 255, 1)'}}>
+                <h2>My Galaxy</h2>
                 {/* 3D TOGGLE BUTTON */}
                 <button 
                     onClick={() => {
@@ -175,14 +175,14 @@ const InfluencerDashboard = () => {
                         border: 'none', borderRadius: '5px', cursor: 'pointer', fontWeight: 'bold' 
                     }}
                 >
-                    🌍 View Influencer Network
+                    Click Me
                 </button>
             </div>
             
             {/* Standard 2D or List View (Placeholder or existing logic if any) */}
-            <div style={{ padding: '20px', background: '#fff', border: '1px solid #eee', borderRadius: '10px', textAlign: 'center', color: '#777' }}>
+            {/* <div style={{ padding: '20px', background: '#fff', border: '1px solid #eee', borderRadius: '10px', textAlign: 'center', color: '#777' }}>
                 <p>Click the button above to explore your connection galaxy in 3D!</p>
-            </div>
+            </div> */}
         </div>
       )}
 

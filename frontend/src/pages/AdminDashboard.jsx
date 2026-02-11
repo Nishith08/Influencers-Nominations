@@ -61,8 +61,16 @@ const AdminDashboard = () => {
     fetchInfluencers();
   };
 
-  return (
-    <div className="container" style={{maxWidth: '1200px'}}> {/* Increased width for more columns */}
+    return (
+        <div className="container" style={{maxWidth: '1200px'}}> {/* Increased width for more columns */}
+            <style>{`
+                .bounce{display:inline-block; will-change:transform; animation: bounce 1.1s cubic-bezier(.28,.84,.42,1) infinite;}
+                @keyframes bounce {
+                    0%,100% { transform: translateY(0); }
+                    40% { transform: translateY(-8px); }
+                    60% { transform: translateY(-4px); }
+                }
+            `}</style>
       
       {/* --- HEADER SECTION --- */}
       <div style={{display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:'20px'}}>
@@ -73,7 +81,7 @@ const AdminDashboard = () => {
                 onClick={() => showTree ? setShowTree(false) : fetchFullTree()}
                 style={{ padding:'10px', background:'#3498db', color:'white', border:'none', borderRadius:'5px', cursor:'pointer' }}
             >
-                {showTree ? "View List" : "View Network Tree"}
+                {showTree ? "View List" : "3D Tree"}
             </button>
 
             <button 
@@ -87,7 +95,13 @@ const AdminDashboard = () => {
 
       {/* --- INVITE SECTION --- */}
       <div style={{ background: 'white', padding: '20px', borderRadius: '10px', marginBottom: '20px', boxShadow: '0 2px 5px rgba(0,0,0,0.1)', textAlign: 'center', border: '1px solid #eee' }}>
-          <h3 style={{ marginTop: 0 }}>🚀 Invite New Influencer</h3>
+                    <h3 style={{ marginTop: 0, color: '#8e44ad' }}>
+                        <span className="bounce" style={{ marginRight: 0, animationDelay: '0s' }}>🤩</span>
+                        <span className="bounce" style={{ marginRight: 0, animationDelay: '0.08s' }}>👉</span>
+                        Invite New Influencer
+                        <span className="bounce" style={{ marginLeft: 0, animationDelay: '0.16s' }}>👈</span>
+                        <span className="bounce" style={{ marginLeft: 0, animationDelay: '0.24s' }}>🤩</span>
+                    </h3>
           <p style={{ color: '#666', fontSize: '14px' }}>Generate a secure, one-time use registration link for a new root influencer.</p>
           
           {!inviteLink ? (
@@ -114,8 +128,8 @@ const AdminDashboard = () => {
             </div>
         </div>
       ) : (
-        <div style={{ overflowX: 'auto', borderRadius: '8px', boxShadow: '0 0 10px rgba(0,0,0,0.05)' }}>
-            <table border="1" style={{width:'100%', borderCollapse:'collapse', background: 'white', fontSize: '14px'}}>
+        <div style={{ overflowX: 'auto', borderRadius: '8px', boxShadow: '0 0 10px rgba(0,0,0,0.05)', color: '#333', background: 'white', padding: '20px', border: '1px solid #eee' }}>
+            <table border="1" style={{width:'100%', borderCollapse:'collapse', background: 'white', fontSize: '14px', border: '1px solid #ddd', borderRadius: '5px', overflow: 'hidden', boxShadow: '0 1px 5px rgba(0,0,0,0.5)' }}>
                 <thead>
                     <tr style={{ background: '#f4f4f4', whiteSpace: 'nowrap' }}>
                         <th style={{ padding: '10px' }}>Name</th>
@@ -123,8 +137,8 @@ const AdminDashboard = () => {
                         <th style={{ padding: '10px' }}>Email</th>
                         <th style={{ padding: '10px' }}>Age</th>
                         <th style={{ padding: '10px' }}>Gender</th>
-                        <th style={{ padding: '10px' }}>Instagram</th>
-                        <th style={{ padding: '10px' }}>YouTube</th>
+                        <th style={{ padding: '10px' }}>IG</th>
+                        <th style={{ padding: '10px' }}>YT</th>
                         <th style={{ padding: '10px' }}>Other</th>
                         <th style={{ padding: '10px' }}>Referred By</th>
                         <th style={{ padding: '10px' }}>Status</th>
@@ -151,7 +165,7 @@ const AdminDashboard = () => {
                             </td>
                             <td style={{ padding: '10px' }}>
                                 {inf.otherLinks ? 
-                                    <a href={inf.otherLinks} target="_blank" rel="noopener noreferrer" style={{color: 'blue', textDecoration:'underline'}}>View</a> 
+                                    <a href={inf.otherLinks} target="_blank" rel="noopener noreferrer" style={{color: 'blue', textDecoration:'none'}}>View</a> 
                                 : '-'}
                             </td>
 
