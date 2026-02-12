@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useParams } from 'react-router-dom';
@@ -88,98 +89,78 @@ const InfluencerRegister = ({ mode }) => {
     window.location.href = '/influencers/login';
   };
 
+
   return (
-    <div className="container" style={{ position: 'relative' }}>
-      <h2>Influencer Registration</h2>
-      
+    <div className="container influencer-register-container">
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: 10 }}>
+        <img src="/MAHI_LOGO.png" alt="Mahi Logo" style={{ width: 90, height: 'auto', marginBottom: 0, borderRadius: 12 }} />
+      </div>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: 0 }}>
+            <h1 className="holi-title">
+              <span>H</span><span>o</span><span>l</span><span>i</span><span>&nbsp;</span><span>P</span><span>a</span><span>r</span><span>t</span><span>y</span>
+            </h1>
+        </div>
+      <h2 className="register-title">Influencer Registration</h2>
       {mode === 'invite' ? (
-        <p style={{ fontSize: '14px', color: '#8e44ad', fontWeight: 'bold' }}>🚀 Joining via Admin Invite</p>
+        <p className="register-subtitle invite">Joining via Admin Invite</p>
       ) : (
-        <p style={{ fontSize: '14px', color: '#2980b9', fontWeight: 'bold' }}>🔗 Joining via Referral Link</p>
+        <p className="register-subtitle referral">Joining via Referral Link</p>
       )}
 
-      <form onSubmit={handleSubmit}>
-        <input name="name" placeholder="Name" required onChange={handleChange} />
-        <input name="phone" placeholder="Phone" required onChange={handleChange} />
-        <input name="email" placeholder="Email" required onChange={handleChange} />
-        <div style={{display:'flex', gap:'10px'}}>
-            <input name="age" type="number" placeholder="Age" required onChange={handleChange} />
-            <select name="gender" onChange={handleChange}>
-                <option>Male</option><option>Female</option>
-            </select>
+      <form className="register-form" onSubmit={handleSubmit}>
+        <div className="input-group">
+          <input name="name" placeholder="Name" required onChange={handleChange} />
+          <input name="phone" placeholder="Phone" required onChange={handleChange} />
         </div>
-        
-        {/* --- UPDATED PROFILE PICTURE INPUT SECTION --- */}
-        <div style={{ margin: '15px 0', textAlign: 'left', background: '#f9f9f9', padding: '10px', borderRadius: '5px', border: '1px dashed #ccc' }}>
-            <label style={{ fontSize: '14px', color: '#333', display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
-                Profile Picture <span style={{color:'red'}}>*</span>
-            </label>
-            
-            <input 
-                type="file" 
-                accept="image/png, image/jpeg, image/jpg, image/webp" 
-                required 
-                onChange={handleFileChange} 
-                style={{ padding: '5px', width: '100%' }} 
-            />
-            
-            {/* Visual Requirement Text */}
-            <p style={{ fontSize: '12px', color: '#777', marginTop: '5px', margin: 0 }}>
-                ℹ️ <strong>Requirements:</strong> Images only (JPG, PNG). Max Size: <strong>5MB</strong>.
-            </p>
+        <div className="input-group">
+          <input name="email" placeholder="Email" required onChange={handleChange} />
         </div>
-
-        <input name="instagram" placeholder="Instagram Link (Required)" required onChange={handleChange} />
-        <div style={{display:'flex', gap:'10px'}}>
-            <input name="youtube" placeholder="YouTube Link (Optional)" onChange={handleChange} />
-            <input name="otherLinks" placeholder="Other Links (Optional)" onChange={handleChange} />
+        <div className="input-group small-group">
+          <input name="age" type="number" placeholder="Age" required onChange={handleChange} />
+          <select name="gender" onChange={handleChange}>
+            <option>Male</option>
+            <option>Female</option>
+          </select>
         </div>
-        
-        <button type="submit" className="pay-btn">Register</button>
+        <div className="profile-pic-upload">
+          <label>
+            Profile Picture <span className="required">*</span>
+          </label>
+          <input 
+            type="file" 
+            accept="image/png, image/jpeg, image/jpg, image/webp" 
+            required 
+            onChange={handleFileChange}
+          />
+          <p className="requirement-text">
+            ℹ️ <strong>Requirements:</strong> Images only (JPG, PNG). Max Size: <strong>5MB</strong>.
+          </p>
+        </div>
+        <div className="input-group">
+          <input name="instagram" placeholder="Instagram Link (Required)" required onChange={handleChange} />
+        </div>
+        <div className="input-group">
+          <input name="youtube" placeholder="YouTube Link (Optional)" onChange={handleChange} />
+          <input name="otherLinks" placeholder="Other Links (Optional)" onChange={handleChange} />
+        </div>
+        <button type="submit" className="pay-btn register-btn">Register</button>
       </form>
 
       {/* --- SUCCESS MODAL --- */}
       {showModal && (
-        <div style={{
-            position: 'fixed', top: 0, left: 0, width: '100%', height: '100%',
-            backgroundColor: 'rgba(0,0,0,0.6)', display: 'flex', justifyContent: 'center', alignItems: 'center',
-            zIndex: 1000
-        }}>
-            <div style={{
-                backgroundColor: 'white', padding: '30px', borderRadius: '15px',
-                width: '90%', maxWidth: '400px', textAlign: 'center',
-                boxShadow: '0 5px 15px rgba(0,0,0,0.3)'
-            }}>
-                <div style={{ fontSize: '50px', marginBottom: '10px' }}>🎉</div>
-                <h3 style={{ color: 'green', margin: '0 0 10px 0' }}>Registration Successful!</h3>
-                <p style={{ color: '#555', fontSize: '14px' }}>Please save your secure password below to login.</p>
-                
-                <div style={{
-                    background: '#f4f4f4', padding: '15px', borderRadius: '8px',
-                    border: '1px dashed #aaa', margin: '20px 0', fontWeight: 'bold', fontSize: '18px', letterSpacing: '1px'
-                }}>
-                    {generatedPass}
-                </div>
-
-                <div style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>
-                    <button 
-                        onClick={copyToClipboard}
-                        style={{ background: '#f39c12', color: 'white', border: 'none', padding: '10px 20px', borderRadius: '5px', cursor: 'pointer', fontWeight:'bold' }}
-                    >
-                        📋 Copy Password
-                    </button>
-                    
-                    <button 
-                        onClick={goToLogin}
-                        style={{ background: '#3498db', color: 'white', border: 'none', padding: '10px 20px', borderRadius: '5px', cursor: 'pointer', fontWeight:'bold' }}
-                    >
-                        Login ➡
-                    </button>
-                </div>
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <div className="modal-emoji">🎉</div>
+            <h3 className="modal-title">Registration Successful!</h3>
+            <p className="modal-desc">Please save your secure password below to login.</p>
+            <div className="modal-password">{generatedPass}</div>
+            <div className="modal-btn-group">
+              <button onClick={copyToClipboard} className="modal-btn copy-btn">📋 Copy Password</button>
+              <button onClick={goToLogin} className="modal-btn login-btn">Login ➡</button>
             </div>
+          </div>
         </div>
       )}
-
     </div>
   );
 };

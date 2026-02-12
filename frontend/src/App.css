@@ -1,3 +1,196 @@
+/* --- Influencer Register Page Styles --- */
+.influencer-register-container {
+  max-width: 700px;
+  margin: 40px auto;
+  background: rgba(255,255,255,0.85);
+  border-radius: 24px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+  padding: 40px 30px 32px 30px;
+  position: relative;
+}
+.register-title {
+  text-align: center;
+  color: #815605;
+  font-size: 2.2rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+  margin-top: 8px;
+  letter-spacing: 1px;
+}
+.register-subtitle {
+  text-align: center;
+  font-size: 1.05rem;
+  font-weight: 600;
+  margin-top: 8px;
+  margin-bottom: 15px;
+  
+}
+.register-subtitle.invite {
+  color: #9b22cf;
+}
+.register-subtitle.referral {
+  color: #a26a34;
+}
+.register-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+.register-form .input-group {
+  display: flex;
+  gap: 14px;
+}
+.register-form .small-group {
+  gap: 14px;
+}
+.register-form input,
+.register-form select {
+  padding: 13px 14px;
+  border-radius: 10px;
+  border: 2px solid #e9ecef;
+  font-size: 1rem;
+  background: #fff;
+  color: #333;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.register-form input:focus,
+.register-form select:focus {
+  border-color: #7d2ae8;
+  box-shadow: 0 0 0 2px #e6d6fa;
+}
+.profile-pic-upload {
+  background: #f7f3ff;
+  border: 1.5px dashed #bfa6e6;
+  border-radius: 10px;
+  padding: 14px 14px 8px 14px;
+  margin-bottom: 0;
+}
+.profile-pic-upload label {
+  font-size: 1rem;
+  color: gray;
+  font-weight: 600;
+  margin-bottom: 6px;
+  display: block;
+}
+.profile-pic-upload .required {
+  color: #e74c3c;
+  font-size: 1.1em;
+}
+.profile-pic-upload input[type="file"] {
+  margin-top: 6px;
+  background: #fff;
+  border: none;
+  padding: 0;
+}
+.requirement-text {
+  font-size: 0.92rem;
+  color: darkgray;
+  margin-top: 6px;
+  margin-bottom: 0;
+}
+.register-btn {
+  margin-top: 10px;
+  background: linear-gradient(90deg, #7d2ae8 0%, #f7971e 100%);
+  color: #fff;
+  border: none;
+  border-radius: 50px;
+  padding: 15px 0;
+  font-size: 1.15rem;
+  font-weight: 700;
+  box-shadow: 0 4px 16px rgba(125,42,232,0.10);
+  transition: background 0.2s, transform 0.2s;
+}
+.register-btn:hover {
+  background: linear-gradient(90deg, #f7971e 0%, #7d2ae8 100%);
+  transform: translateY(-2px) scale(1.03);
+}
+/* Modal Styles */
+.modal-overlay {
+  position: fixed;
+  top: 0; left: 0; width: 100vw; height: 100vh;
+  background: rgba(0,0,0,0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+}
+.modal-content {
+  background: #fff;
+  border-radius: 18px;
+  padding: 36px 24px 28px 24px;
+  width: 90vw;
+  max-width: 370px;
+  text-align: center;
+  box-shadow: 0 8px 32px rgba(125,42,232,0.13);
+}
+.modal-emoji {
+  font-size: 2.7rem;
+  margin-bottom: 8px;
+}
+.modal-title {
+  color: #28a745;
+  margin-bottom: 8px;
+  font-size: 1.3rem;
+  font-weight: 700;
+}
+.modal-desc {
+  color: #555;
+  font-size: 1rem;
+  margin-bottom: 18px;
+}
+.modal-password {
+  background: #f7f3ff;
+  color: #7d2ae8;
+  padding: 13px 0;
+  border-radius: 8px;
+  border: 1.5px dashed #bfa6e6;
+  margin: 18px 0 18px 0;
+  font-weight: 700;
+  font-size: 1.15rem;
+  letter-spacing: 1px;
+}
+.modal-btn-group {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+.modal-btn {
+  flex: 1;
+  padding: 10px 0;
+  border-radius: 6px;
+  border: none;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s;
+}
+.copy-btn {
+  background: #f39c12;
+  color: #fff;
+}
+.copy-btn:hover {
+  background: #e67e22;
+  transform: scale(1.04);
+}
+.login-btn {
+  background: #3498db;
+  color: #fff;
+}
+.login-btn:hover {
+  background: #217dbb;
+  transform: scale(1.04);
+}
+@media (max-width: 600px) {
+  .influencer-register-container {
+    padding: 18px 4vw 18px 4vw;
+  }
+  .register-title {
+    font-size: 1.5rem;
+  }
+  .modal-content {
+    padding: 18px 6vw 18px 6vw;
+  }
+}
 /* General Reset */
 * { 
   box-sizing: border-box; 
@@ -144,7 +337,7 @@ body {
 .input-group { 
   display: flex; 
   gap: 15px; 
-  margin-bottom: 15px; 
+  /* margin-bottom: 15px;  */
 }
 input, select {
   width: 100%;

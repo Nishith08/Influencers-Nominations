@@ -74,7 +74,7 @@ const InfluencerDashboard = () => {
       
       {/* --- HEADER WITH PROFILE DROPDOWN --- */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', position: 'relative', color: '#333' }}>
-        <h1>Welcome, {user.name}</h1>
+        <h2>Welcome, {user.name}</h2>
         
         {/* Profile Icon Wrapper */}
         <div ref={dropdownRef} style={{ position: 'relative' }}>
@@ -208,10 +208,10 @@ const InfluencerDashboard = () => {
             }}>
                 <button 
                     onClick={() => setShowProfileModal(false)}
-                    style={{ position: 'absolute', top: '10px', right: '15px', background: 'none', border: 'none', fontSize: '20px', cursor: 'pointer' }}
+                    style={{ position: 'absolute', top: '10px', right: '15px', background: 'none', border: 'none', fontSize: '20px', cursor: 'pointer', color: 'crimson' }}
                 >✖</button>
                 
-                <h2 style={{ textAlign: 'center', marginBottom: '20px', borderBottom: '2px solid #3498db', paddingBottom: '10px' }}>My Profile</h2>
+                <h2 style={{ textAlign: 'center', marginBottom: '20px', marginTop: '0', borderBottom: '2px solid #3498db', paddingBottom: '10px', color: '#3498db' }}>My Profile</h2>
                 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', alignItems: 'center' }}>
                      {/* Large Profile Picture in Modal */}
@@ -235,7 +235,7 @@ const InfluencerDashboard = () => {
                         </div>
                     )}
 
-                    <div style={{ width: '100%', textAlign: 'left' }}>
+                    <div style={{ width: '100%', textAlign: 'left', color: '#333' }}>
                         <p><strong>Name:</strong> {user.name}</p>
                         <p><strong>Email:</strong> {user.email}</p>
                         <p><strong>Phone:</strong> {user.phone}</p>
