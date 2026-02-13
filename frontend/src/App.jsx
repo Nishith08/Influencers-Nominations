@@ -15,7 +15,7 @@ function App() {
     <BrowserRouter>
       <Routes>
         {/* Public Routes */}
-        <Route path="/" element={<BookingPage />} />
+        {/* <Route path="/" element={<BookingPage />} /> */}
         <Route path="/influencers/register/:token" element={<InfluencerRegister mode="invite" />} />
         <Route path="/influencers/login" element={<InfluencerLogin />} />
         <Route path="/influencers/:token" element={<InfluencerRegister mode="referral"/>} />
