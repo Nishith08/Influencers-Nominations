@@ -60,7 +60,7 @@ const fileFilter = (req, file, cb) => {
 };
 
 // Add limits (optional but recommended) to prevent massive files
-const upload = multer({ 
+const upload = multer({
     storage: storage,
     fileFilter: fileFilter,
     limits: {
@@ -98,15 +98,24 @@ router.post('/register', upload.single('profilePic'), async (req, res) => {
             return res.status(400).json({ message: "This invite link has already been used." });
         }
     } 
-    // SCENARIO B: Registration via PEER REFERRAL
+    // SCENARIO B: Registration via PEER REFERRAL (UPDATED)
     else if (referralToken && referralToken !== 'null') {
         const parent = await Influencer.findOne({ referralToken });
         
         if (!parent) {
             return res.status(400).json({ message: "Invalid Referral Link." });
         }
-        if (parent.referralCount >= 2) {
-            return res.status(400).json({ message: "This referrer has reached their limit (2/2)." });
+
+        // --- NEW CHECK: Count valid slots only ---
+        // We count referrals that are NOT 'Rejected'. 
+        // If a referral was rejected, they don't count, so this number stays low.
+        const validReferrals = await Influencer.countDocuments({
+            referredBy: parent._id,
+            status: { $ne: 'Rejected' } 
+        });
+
+        if (validReferrals >= 2) {
+            return res.status(400).json({ message: "This referrer has reached their limit (2/2 active referrals)." });
         }
         
         parentId = parent._id; 
@@ -127,7 +136,7 @@ router.post('/register', upload.single('profilePic'), async (req, res) => {
       name, phone, email, age, gender, instagram, youtube, otherLinks,
       password: autoPassword,
       referredBy: parentId,     
-      profilePic: req.file.filename // <--- SAVE FILENAME
+      profilePic: req.file.filename
     });
 
     await newInfluencer.save();
@@ -140,13 +149,14 @@ router.post('/register', upload.single('profilePic'), async (req, res) => {
     }
 
     if (parentId) {
+        // We still increment the raw counter for historical tracking
         await Influencer.findByIdAndUpdate(parentId, { $inc: { referralCount: 1 } });
     }
 
     res.json({ message: "Registration Successful!", generatedPassword: autoPassword });
 
   } catch (error) {
-    console.error("Register Error:", error); // Helpful for debugging
+    console.error("Register Error:", error); 
     res.status(500).json({ error: error.message });
   }
 });

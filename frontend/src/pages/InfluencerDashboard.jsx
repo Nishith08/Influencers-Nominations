@@ -61,7 +61,7 @@ const InfluencerDashboard = () => {
 
   const handleLogout = () => {
     localStorage.clear();
-    window.location.replace('/influencers/login');
+    window.location.replace('/');
   };
 
   if (loading) return <div>Loading Profile...</div>;

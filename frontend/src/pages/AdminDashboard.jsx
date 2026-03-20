@@ -4,8 +4,10 @@ import NetworkTree from '../components/NetworkTree';
 
 const AdminDashboard = () => {
   const [influencers, setInfluencers] = useState([]);
-  const [showTree, setShowTree] = useState(false);
   const [fullTreeData, setFullTreeData] = useState([]);
+  
+  // --- STATE FOR VIEW MODE ('list', 'nominations', 'tree') ---
+  const [viewMode, setViewMode] = useState('list');
   
   // --- STATE FOR INVITE LINK ---
   const [inviteLink, setInviteLink] = useState("");
@@ -13,7 +15,6 @@ const AdminDashboard = () => {
   // 1. Fetch List
   const fetchInfluencers = async () => {
     try {
-      // Assuming __BACKEND_URL__ is defined in your vite.config.js
       const res = await axios.get(`${__BACKEND_URL__}/api/admin/influencers`);
       setInfluencers(res.data);
     } catch (err) {
@@ -26,7 +27,7 @@ const AdminDashboard = () => {
     try {
         const res = await axios.get(`${__BACKEND_URL__}/api/admin/full-tree`);
         setFullTreeData(res.data);
-        setShowTree(true);
+        setViewMode('tree');
     } catch (err) {
         alert("Error fetching tree");
     }
@@ -35,7 +36,7 @@ const AdminDashboard = () => {
   // 3. Secure Logout Function
   const handleLogout = () => {
     localStorage.clear(); 
-    window.location.replace('/influencers/login'); 
+    window.location.replace('/'); 
   };
 
   // 4. Generate Invite Link Function
@@ -61,16 +62,35 @@ const AdminDashboard = () => {
     fetchInfluencers();
   };
 
-    return (
-        <div className="container" style={{maxWidth: '1200px'}}> {/* Increased width for more columns */}
-            <style>{`
-                .bounce{display:inline-block; will-change:transform; animation: bounce 1.1s cubic-bezier(.28,.84,.42,1) infinite;}
-                @keyframes bounce {
-                    0%,100% { transform: translateY(0); }
-                    40% { transform: translateY(-8px); }
-                    60% { transform: translateY(-4px); }
-                }
-            `}</style>
+  // --- CALCULATION FOR NOMINATIONS ---
+  // Count how many 'Accepted' referrals each parent has
+  const acceptedReferralsCount = {};
+  influencers.forEach(inf => {
+      // If the user is accepted AND has a referrer
+      if (inf.status === 'Accepted' && inf.referredBy && inf.referredBy._id) {
+          const parentId = inf.referredBy._id;
+          acceptedReferralsCount[parentId] = (acceptedReferralsCount[parentId] || 0) + 1;
+      }
+  });
+
+  // Find IDs of influencers who have >= 2 accepted referrals
+  const nominatedIds = Object.keys(acceptedReferralsCount).filter(id => acceptedReferralsCount[id] >= 2);
+
+  // Filter the list based on the current view mode
+  const displayedInfluencers = viewMode === 'nominations' 
+      ? influencers.filter(inf => nominatedIds.includes(String(inf._id)))
+      : influencers;
+
+  return (
+    <div className="container" style={{maxWidth: '1200px'}}>
+        <style>{`
+            .bounce{display:inline-block; will-change:transform; animation: bounce 1.1s cubic-bezier(.28,.84,.42,1) infinite;}
+            @keyframes bounce {
+                0%,100% { transform: translateY(0); }
+                40% { transform: translateY(-8px); }
+                60% { transform: translateY(-4px); }
+            }
+        `}</style>
       
       {/* --- HEADER SECTION --- */}
       <div style={{display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:'20px'}}>
@@ -78,10 +98,22 @@ const AdminDashboard = () => {
           
           <div style={{ display: 'flex', gap: '10px' }}>
             <button 
-                onClick={() => showTree ? setShowTree(false) : fetchFullTree()}
-                style={{ padding:'10px', background:'#3498db', color:'white', border:'none', borderRadius:'5px', cursor:'pointer' }}
+                onClick={() => setViewMode('list')}
+                style={{ padding:'10px', background: viewMode === 'list' ? '#2c3e50' : '#3498db', color:'white', border:'none', borderRadius:'5px', cursor:'pointer' }}
             >
-                {showTree ? "View List" : "3D Tree"}
+                All Influencers
+            </button>
+            <button 
+                onClick={() => setViewMode('nominations')}
+                style={{ padding:'10px', background: viewMode === 'nominations' ? '#2c3e50' : '#8e44ad', color:'white', border:'none', borderRadius:'5px', cursor:'pointer' }}
+            >
+                ⭐ Nominations
+            </button>
+            <button 
+                onClick={fetchFullTree}
+                style={{ padding:'10px', background: viewMode === 'tree' ? '#2c3e50' : '#3498db', color:'white', border:'none', borderRadius:'5px', cursor:'pointer' }}
+            >
+                3D Tree
             </button>
 
             <button 
@@ -95,13 +127,13 @@ const AdminDashboard = () => {
 
       {/* --- INVITE SECTION --- */}
       <div style={{ background: 'white', padding: '20px', borderRadius: '10px', marginBottom: '20px', boxShadow: '0 2px 5px rgba(0,0,0,0.1)', textAlign: 'center', border: '1px solid #eee' }}>
-                    <h3 style={{ marginTop: 0, color: '#8e44ad' }}>
-                        <span className="bounce" style={{ marginRight: 0, animationDelay: '0s' }}>🤩</span>
-                        <span className="bounce" style={{ marginRight: 0, animationDelay: '0.08s' }}>👉</span>
-                        Invite New Influencer
-                        <span className="bounce" style={{ marginLeft: 0, animationDelay: '0.16s' }}>👈</span>
-                        <span className="bounce" style={{ marginLeft: 0, animationDelay: '0.24s' }}>🤩</span>
-                    </h3>
+            <h3 style={{ marginTop: 0, color: '#8e44ad' }}>
+                <span className="bounce" style={{ marginRight: 0, animationDelay: '0s' }}>🤩</span>
+                <span className="bounce" style={{ marginRight: 0, animationDelay: '0.08s' }}>👉</span>
+                Invite New Influencer
+                <span className="bounce" style={{ marginLeft: 0, animationDelay: '0.16s' }}>👈</span>
+                <span className="bounce" style={{ marginLeft: 0, animationDelay: '0.24s' }}>🤩</span>
+            </h3>
           <p style={{ color: '#666', fontSize: '14px' }}>Generate a secure, one-time use registration link for a new root influencer.</p>
           
           {!inviteLink ? (
@@ -118,86 +150,95 @@ const AdminDashboard = () => {
       </div>
 
       {/* --- MAIN CONTENT --- */}
-      {showTree ? (
+      {viewMode === 'tree' ? (
         <div style={{ textAlign: 'center' }}>
             <h3>Full Influencer Network</h3>
             <div style={{ background:'#f9f9f9', padding:'20px', borderRadius:'10px', overflowX: 'auto' }}>
                 <NetworkTree 
-                data={fullTreeData}
-                onClose={() => setShowTree(false)} />
+                    data={fullTreeData}
+                    onClose={() => setViewMode('list')} 
+                />
             </div>
         </div>
       ) : (
         <div style={{ overflowX: 'auto', borderRadius: '8px', boxShadow: '0 0 10px rgba(0,0,0,0.05)', color: '#333', background: 'white', padding: '20px', border: '1px solid #eee' }}>
-            <table border="1" style={{width:'100%', borderCollapse:'collapse', background: 'white', fontSize: '14px', border: '1px solid #ddd', borderRadius: '5px', overflow: 'hidden', boxShadow: '0 1px 5px rgba(0,0,0,0.5)' }}>
-                <thead>
-                    <tr style={{ background: '#f4f4f4', whiteSpace: 'nowrap' }}>
-                        <th style={{ padding: '10px' }}>Name</th>
-                        <th style={{ padding: '10px' }}>Phone</th>
-                        <th style={{ padding: '10px' }}>Email</th>
-                        <th style={{ padding: '10px' }}>Age</th>
-                        <th style={{ padding: '10px' }}>Gender</th>
-                        <th style={{ padding: '10px' }}>IG</th>
-                        <th style={{ padding: '10px' }}>YT</th>
-                        <th style={{ padding: '10px' }}>Other</th>
-                        <th style={{ padding: '10px' }}>Referred By</th>
-                        <th style={{ padding: '10px' }}>Status</th>
-                        <th style={{ padding: '10px' }}>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {influencers.map(inf => (
-                        <tr key={inf._id} style={{ textAlign: 'center' }}>
-                            <td style={{ padding: '10px' }}>{inf.name}</td>
-                            <td style={{ padding: '10px' }}>{inf.phone}</td>
-                            <td style={{ padding: '10px' }}>{inf.email}</td>
-                            <td style={{ padding: '10px' }}>{inf.age}</td>
-                            <td style={{ padding: '10px' }}>{inf.gender}</td>
-                            
-                            {/* Social Links */}
-                            <td style={{ padding: '10px' }}>
-                                <a href={inf.instagram} target="_blank" rel="noopener noreferrer" style={{color: '#E1306C', fontWeight:'bold', textDecoration:'none'}}>View</a>
-                            </td>
-                            <td style={{ padding: '10px' }}>
-                                {inf.youtube ? 
-                                    <a href={inf.youtube} target="_blank" rel="noopener noreferrer" style={{color: 'red', fontWeight:'bold', textDecoration:'none'}}>View</a> 
-                                : '-'}
-                            </td>
-                            <td style={{ padding: '10px' }}>
-                                {inf.otherLinks ? 
-                                    <a href={inf.otherLinks} target="_blank" rel="noopener noreferrer" style={{color: 'blue', textDecoration:'none'}}>View</a> 
-                                : '-'}
-                            </td>
-
-                            <td style={{ padding: '10px' }}>{inf.referredBy?.name || 'Direct'}</td>
-                            
-                            {/* Status Badge */}
-                            <td style={{ padding: '10px' }}>
-                                <span style={{ 
-                                    padding: '5px 10px', borderRadius: '15px', 
-                                    background: inf.status === 'Accepted' ? '#d4edda' : inf.status === 'Rejected' ? '#f8d7da' : '#fff3cd',
-                                    color: inf.status === 'Accepted' ? '#155724' : inf.status === 'Rejected' ? '#721c24' : '#856404',
-                                    fontWeight: 'bold', fontSize: '11px', textTransform: 'uppercase'
-                                }}>
-                                    {inf.status}
-                                </span>
-                            </td>
-
-                            {/* Actions */}
-                            <td style={{ padding: '10px', whiteSpace: 'nowrap' }}>
-                                {inf.status === 'Pending' && (
-                                    <>
-                                        <button onClick={() => updateStatus(inf._id, 'Accepted')} style={{background:'green', color:'white', border:'none', padding:'5px 10px', borderRadius:'3px', cursor:'pointer', marginRight:'5px'}}>✓</button>
-                                        <button onClick={() => updateStatus(inf._id, 'Rejected')} style={{background:'red', color:'white', border:'none', padding:'5px 10px', borderRadius:'3px', cursor:'pointer'}}>✕</button>
-                                    </>
-                                )}
-                                {inf.status === 'Accepted' && <span style={{ color: 'green', fontSize:'18px' }}>✅</span>}
-                                {inf.status === 'Rejected' && <span style={{ color: 'red', fontSize:'18px' }}>❌</span>}
-                            </td>
+            <h3 style={{ marginTop: 0, marginBottom: '20px', color: viewMode === 'nominations' ? '#8e44ad' : '#333' }}>
+                {viewMode === 'nominations' ? '⭐ Nominated Influencers (2+ Accepted Referrals)' : 'All Influencers'}
+            </h3>
+            
+            {displayedInfluencers.length === 0 ? (
+                <p style={{ textAlign: 'center', color: '#777' }}>No influencers found for this category.</p>
+            ) : (
+                <table border="1" style={{width:'100%', borderCollapse:'collapse', background: 'white', fontSize: '14px', border: '1px solid #ddd', borderRadius: '5px', overflow: 'hidden', boxShadow: '0 1px 5px rgba(0,0,0,0.5)' }}>
+                    <thead>
+                        <tr style={{ background: '#f4f4f4', whiteSpace: 'nowrap' }}>
+                            <th style={{ padding: '10px' }}>Name</th>
+                            <th style={{ padding: '10px' }}>Phone</th>
+                            <th style={{ padding: '10px' }}>Email</th>
+                            <th style={{ padding: '10px' }}>Age</th>
+                            <th style={{ padding: '10px' }}>Gender</th>
+                            <th style={{ padding: '10px' }}>IG</th>
+                            <th style={{ padding: '10px' }}>YT</th>
+                            <th style={{ padding: '10px' }}>Other</th>
+                            <th style={{ padding: '10px' }}>Referred By</th>
+                            <th style={{ padding: '10px' }}>Status</th>
+                            <th style={{ padding: '10px' }}>Actions</th>
                         </tr>
-                    ))}
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        {displayedInfluencers.map(inf => (
+                            <tr key={inf._id} style={{ textAlign: 'center' }}>
+                                <td style={{ padding: '10px' }}>{inf.name}</td>
+                                <td style={{ padding: '10px' }}>{inf.phone}</td>
+                                <td style={{ padding: '10px' }}>{inf.email}</td>
+                                <td style={{ padding: '10px' }}>{inf.age}</td>
+                                <td style={{ padding: '10px' }}>{inf.gender}</td>
+                                
+                                {/* Social Links */}
+                                <td style={{ padding: '10px' }}>
+                                    <a href={inf.instagram} target="_blank" rel="noopener noreferrer" style={{color: '#E1306C', fontWeight:'bold', textDecoration:'none'}}>View</a>
+                                </td>
+                                <td style={{ padding: '10px' }}>
+                                    {inf.youtube ? 
+                                        <a href={inf.youtube} target="_blank" rel="noopener noreferrer" style={{color: 'red', fontWeight:'bold', textDecoration:'none'}}>View</a> 
+                                    : '-'}
+                                </td>
+                                <td style={{ padding: '10px' }}>
+                                    {inf.otherLinks ? 
+                                        <a href={inf.otherLinks} target="_blank" rel="noopener noreferrer" style={{color: 'blue', textDecoration:'none'}}>View</a> 
+                                    : '-'}
+                                </td>
+
+                                <td style={{ padding: '10px' }}>{inf.referredBy?.name || 'Direct'}</td>
+                                
+                                {/* Status Badge */}
+                                <td style={{ padding: '10px' }}>
+                                    <span style={{ 
+                                        padding: '5px 10px', borderRadius: '15px', 
+                                        background: inf.status === 'Accepted' ? '#d4edda' : inf.status === 'Rejected' ? '#f8d7da' : '#fff3cd',
+                                        color: inf.status === 'Accepted' ? '#155724' : inf.status === 'Rejected' ? '#721c24' : '#856404',
+                                        fontWeight: 'bold', fontSize: '11px', textTransform: 'uppercase'
+                                    }}>
+                                        {inf.status}
+                                    </span>
+                                </td>
+
+                                {/* Actions */}
+                                <td style={{ padding: '10px', whiteSpace: 'nowrap' }}>
+                                    {inf.status === 'Pending' && (
+                                        <>
+                                            <button onClick={() => updateStatus(inf._id, 'Accepted')} style={{background:'green', color:'white', border:'none', padding:'5px 10px', borderRadius:'3px', cursor:'pointer', marginRight:'5px'}}>✓</button>
+                                            <button onClick={() => updateStatus(inf._id, 'Rejected')} style={{background:'red', color:'white', border:'none', padding:'5px 10px', borderRadius:'3px', cursor:'pointer'}}>✕</button>
+                                        </>
+                                    )}
+                                    {inf.status === 'Accepted' && <span style={{ color: 'green', fontSize:'18px' }}>✅</span>}
+                                    {inf.status === 'Rejected' && <span style={{ color: 'red', fontSize:'18px' }}>❌</span>}
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            )}
         </div>
       )}
     </div>
