@@ -91,15 +91,15 @@ const InfluencerRegister = ({ mode }) => {
 
 
   return (
-    <div className="container influencer-register-container">
+    <div className="container influencer-register-container" style={{ backdropFilter: 'blur(8px)', border: '1.5px solid rgba(255,255,255,0.25)' }}>
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: 10 }}>
-        <img src="/MAHI_LOGO.png" alt="Mahi Logo" style={{ width: 90, height: 'auto', marginBottom: 0, borderRadius: 12 }} />
+        <img src="/emblm.webp" alt="Sigma Logo" style={{ width: 90, height: 'auto', marginBottom: 0, borderRadius: 12, filter: 'drop-shadow(1px 1px 4px black)' }} />
       </div>
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: 0 }}>
+        {/* <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: 0 }}>
             <h1 className="holi-title">
               <span>H</span><span>o</span><span>l</span><span>i</span><span>&nbsp;</span><span>P</span><span>a</span><span>r</span><span>t</span><span>y</span>
             </h1>
-        </div>
+        </div> */}
       <h2 className="register-title">Influencer Registration</h2>
       {mode === 'invite' ? (
         <p className="register-subtitle invite">Joining via Admin Invite</p>
@@ -145,6 +145,14 @@ const InfluencerRegister = ({ mode }) => {
         </div>
         <button type="submit" className="pay-btn register-btn">Register</button>
       </form>
+
+      {/* Already signed up login link */}
+      <div style={{ textAlign: 'center', marginTop: '15px', color: '#666', fontSize: '14px' }}>
+        Already signed up? <span 
+          onClick={() => window.location.href = '/'} 
+          style={{ color: '#3498db', cursor: 'pointer', textDecoration: 'underline', fontWeight: 'bold' }}
+        >LOGIN</span>
+      </div>
 
       {/* --- SUCCESS MODAL --- */}
       {showModal && (

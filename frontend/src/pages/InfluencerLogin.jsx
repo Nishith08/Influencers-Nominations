@@ -39,7 +39,7 @@ const InfluencerLogin = () => {
         flexDirection: 'column',
         alignItems: 'center',
       }}>
-        <img src="/MAHI_LOGO.png" alt="Mahi Logo" style={{ width: 100, marginBottom: 0 }} />
+        <img src="/emblm.webp" alt="Sigma University Logo" style={{ width: 100, marginBottom: 0, filter: 'drop-shadow(1px 1px 4px black)'}} />
         <h2
           style={{
             fontSize: '2.7rem',
@@ -47,10 +47,10 @@ const InfluencerLogin = () => {
             marginBottom: 10,
             marginTop: 10,
             letterSpacing: 2,
-            background: 'linear-gradient(90deg, #7d2ae8 0%, #f7971e 100%)',
+            background: 'linear-gradient(90deg, #351262 0%, #784405 100%)',
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
-            textShadow: '0 4px 24px rgba(125,42,232,0.13), 0 1px 0 #fff',
+            textShadow: '0 4px 24px rgba(125,42,232,0.13), -2px -2px 0 #fff',
             textAlign: 'center',
             borderRadius: 8,
             padding: '6px 0',

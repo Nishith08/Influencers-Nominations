@@ -74,7 +74,7 @@ const InfluencerDashboard = () => {
       
       {/* --- HEADER WITH PROFILE DROPDOWN --- */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', position: 'relative', color: '#333' }}>
-        <h2>Welcome, {user.name}</h2>
+        <h2 className="register-title">Welcome, {user.name}</h2>
         
         {/* Profile Icon Wrapper */}
         <div ref={dropdownRef} style={{ position: 'relative' }}>
@@ -244,14 +244,14 @@ const InfluencerDashboard = () => {
                         
                         <hr style={{ width: '100%', border: '0', borderTop: '1px solid #eee', margin: '10px 0' }} />
                         
-                        <p><strong>Instagram:</strong> <a href={user.instagram} target="_blank" rel="noopener noreferrer" style={{color: '#E1306C'}}>View Profile</a></p>
+                        <p><strong>Instagram:</strong> <a href={user.instagram.startsWith('http') ? user.instagram : `https://${user.instagram}`} target="_blank" rel="noopener noreferrer" style={{color: '#E1306C'}}>View Profile</a></p>
                         
                         {user.youtube && (
-                            <p><strong>YouTube:</strong> <a href={user.youtube} target="_blank" rel="noopener noreferrer" style={{color: 'red'}}>View Channel</a></p>
+                            <p><strong>YouTube:</strong> <a href={user.youtube.startsWith('http') ? user.youtube : `https://${user.youtube}`} target="_blank" rel="noopener noreferrer" style={{color: 'red'}}>View Channel</a></p>
                         )}
                         
                         {user.otherLinks && (
-                            <p><strong>Other Links:</strong> <a href={user.otherLinks} target="_blank" rel="noopener noreferrer">View Link</a></p>
+                            <p><strong>Other Links:</strong> <a href={user.otherLinks.startsWith('http') ? user.otherLinks : `https://${user.otherLinks}`} target="_blank" rel="noopener noreferrer">View Link</a></p>
                         )}
                     </div>
                 </div>

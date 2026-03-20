@@ -10,7 +10,8 @@
 }
 .register-title {
   text-align: center;
-  color: #815605;
+  color: #be9027 ;
+  text-shadow: 1px 1px 4px black;
   font-size: 2.2rem;
   font-weight: 700;
   margin-bottom: 8px;
@@ -23,13 +24,14 @@
   font-weight: 600;
   margin-top: 8px;
   margin-bottom: 15px;
+  text-shadow: 1px 1px 4px black;
   
 }
 .register-subtitle.invite {
-  color: #9b22cf;
+  color: #ffffff;
 }
 .register-subtitle.referral {
-  color: #a26a34;
+  color: #ffffff;
 }
 .register-form {
   display: flex;
@@ -200,12 +202,12 @@
 body { 
   margin: 0; 
   padding: 0; 
-  background: linear-gradient(135deg, rgba(255, 107, 107, 0.8) 0%, rgba(255, 230, 109, 0.8) 25%, rgba(168, 230, 207, 0.8) 50%, rgba(221, 160, 221, 0.8) 75%, rgba(152, 216, 200, 0.8) 100%);
+  background: url('https://images.unsplash.com/photo-1764874298962-ac0c84307fc0?w=1920');
   /* background: linear-gradient(135deg, rgba(255, 107, 107, 0.5) 0%, rgba(255, 230, 109, 0.5) 25%, rgba(168, 230, 207, 0.5) 50%, rgba(221, 160, 221, 0.5) 75%, rgba(152, 216, 200, 0.5) 100%), url('/bg.jpg'); */
-  background-size: 150% 150%, cover;
-  background-position: 0% 50%, center;
+  background-size: 100% 100%, cover;
+  background-position: center;
   background-repeat: no-repeat, no-repeat;
-  animation: holiGradient 10s ease infinite;
+  /* animation: holiGradient 10s ease infinite; */
   min-height: 100vh;
   display: flex;
   justify-content: center;
@@ -614,4 +616,17 @@ input::placeholder, select::placeholder {
     font-weight: bold;
     min-width: 80px;
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.header-dashboard {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+@media (max-width: 768px) {
+  .header-dashboard {
+    flex-direction: column;
+  }
 }
