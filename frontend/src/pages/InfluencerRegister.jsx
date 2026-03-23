@@ -86,7 +86,7 @@ const InfluencerRegister = ({ mode }) => {
   };
 
   const goToLogin = () => {
-    window.location.href = '/influencers/login';
+    window.location.href = '/';
   };
 
 
