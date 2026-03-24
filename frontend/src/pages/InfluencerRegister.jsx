@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useParams } from 'react-router-dom';
@@ -95,12 +94,8 @@ const InfluencerRegister = ({ mode }) => {
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: 10 }}>
         <img src="/emblm.webp" alt="Sigma Logo" style={{ width: 90, height: 'auto', marginBottom: 0, borderRadius: 12, filter: 'drop-shadow(1px 1px 4px black)' }} />
       </div>
-        {/* <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: 0 }}>
-            <h1 className="holi-title">
-              <span>H</span><span>o</span><span>l</span><span>i</span><span>&nbsp;</span><span>P</span><span>a</span><span>r</span><span>t</span><span>y</span>
-            </h1>
-        </div> */}
-      <h2 className="register-title">Influencer Registration</h2>
+
+      <h2 className="register-title" style={{textAlign:'center'}}>Influencer Registration</h2>
       {mode === 'invite' ? (
         <p className="register-subtitle invite">Joining via Admin Invite</p>
       ) : (
@@ -160,7 +155,8 @@ const InfluencerRegister = ({ mode }) => {
           <div className="modal-content">
             <div className="modal-emoji">🎉</div>
             <h3 className="modal-title">Registration Successful!</h3>
-            <p className="modal-desc">Please save your secure password below to login.</p>
+            {/* UPDATED TEXT HERE TO MENTION THE EMAIL */}
+            <p className="modal-desc">We have emailed your login credentials. You can also safely copy your password below.</p>
             <div className="modal-password">{generatedPass}</div>
             <div className="modal-btn-group">
               <button onClick={copyToClipboard} className="modal-btn copy-btn">📋 Copy Password</button>

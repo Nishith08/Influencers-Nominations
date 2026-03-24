@@ -15,6 +15,9 @@ const InfluencerDashboard = () => {
   // --- NEW STATE FOR 3D TREE MODE ---
   const [showTreeMode, setShowTreeMode] = useState(false);
 
+  // --- STATE FOR COPY FEEDBACK ---
+  const [copied, setCopied] = useState(false);
+
   useEffect(() => {
     const fetchProfile = async () => {
       const token = localStorage.getItem('token');
@@ -64,13 +67,28 @@ const InfluencerDashboard = () => {
     window.location.replace('/');
   };
 
+  const handleCopyLink = () => {
+    const referralLink = `${__FRONTEND_URL__}/influencers/${user.referralToken}`;
+    navigator.clipboard.writeText(referralLink);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
   if (loading) return <div>Loading Profile...</div>;
   if (!user) return <div>Access Denied</div>;
 
   const referralLink = `${__FRONTEND_URL__}/influencers/${user.referralToken}`;
 
   return (
-    <div className="container">
+  <>
+    {/* --- FULL SCREEN 3D TREE --- */}
+      {showTreeMode && (
+          <NetworkTree 
+            data={treeData} 
+            onClose={() => setShowTreeMode(false)} 
+          />
+      )}
+    <div className="container" style={{backdropFilter: 'blur(8px)', backgroundColor: 'rgba(255, 255, 255, 0.1)', border: '1.5px solid rgba(255,255,255,0.25)', borderRadius: '10px', padding: '30px'}}>
       
       {/* --- HEADER WITH PROFILE DROPDOWN --- */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', position: 'relative', color: '#333' }}>
@@ -138,7 +156,7 @@ const InfluencerDashboard = () => {
       </div>
       
       {/* --- STATUS CARD --- */}
-      <div style={{ padding: '20px', background: '#f4f4f4', borderRadius: '8px', marginBottom:'20px', color: '#333', boxShadow: '0 2px 5px rgba(0,0,0,0.1)', border: '1px solid #eee' }}>
+      <div style={{ padding: '20px', background: '#f4f4f4c1', borderRadius: '8px', marginBottom:'20px', color: '#333', boxShadow: '0 2px 5px rgba(0,0,0,0.1)', border: '1px solid #eee' }}>
         <h3>Application Status: 
             <span style={{ 
                 color: user.status === 'Accepted' ? 'green' : user.status === 'Rejected' ? 'red' : 'orange', 
@@ -150,7 +168,22 @@ const InfluencerDashboard = () => {
 
         {user.status === 'Accepted' && (
             <>
-                <p><strong>Referral Link:</strong> <a href={referralLink}>{referralLink}</a></p>
+                <p><strong>Referral Link:</strong> <a style={{wordWrap:'break-word'}} href={referralLink}>{referralLink}</a></p>
+                <button 
+                    onClick={handleCopyLink}
+                    style={{
+                        padding: '8px 16px',
+                        backgroundColor: copied ? '#27ae60' : '#646cff',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '5px',
+                        cursor: 'pointer',
+                        fontWeight: 'bold',
+                        transition: 'background-color 0.3s ease'
+                    }}
+                >
+                    {copied ? '✓ Copied!' : 'Copy Link'}
+                </button>
                 <p><em>Share this link to invite up to 2 influencers.</em></p>
             </>
         )}
@@ -171,7 +204,7 @@ const InfluencerDashboard = () => {
                   }
                 }}
                     style={{ 
-                        padding: '10px 20px', background: '#8e44ad', color: 'white', 
+                        padding: '10px 20px', background: 'linear-gradient(90deg, rgb(125, 42, 232) 0%, rgb(247, 151, 30) 100%)', color: 'white', 
                         border: 'none', borderRadius: '5px', cursor: 'pointer', fontWeight: 'bold' 
                     }}
                 >
@@ -186,13 +219,7 @@ const InfluencerDashboard = () => {
         </div>
       )}
 
-      {/* --- FULL SCREEN 3D TREE --- */}
-      {showTreeMode && (
-          <NetworkTree 
-            data={treeData} 
-            onClose={() => setShowTreeMode(false)} 
-          />
-      )}
+      
 
       {/* --- PROFILE MODAL --- */}
       {showProfileModal && (
@@ -211,9 +238,9 @@ const InfluencerDashboard = () => {
                     style={{ position: 'absolute', top: '10px', right: '15px', background: 'none', border: 'none', fontSize: '20px', cursor: 'pointer', color: 'crimson' }}
                 >✖</button>
                 
-                <h2 style={{ textAlign: 'center', marginBottom: '20px', marginTop: '0', borderBottom: '2px solid #3498db', paddingBottom: '10px', color: '#3498db' }}>My Profile</h2>
+                {/* <h2 style={{ textAlign: 'center', marginBottom: '20px', marginTop: '0', borderBottom: '2px solid #3498db', paddingBottom: '10px', color: '#3498db' }}>My Profile</h2> */}
                 
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', alignItems: 'center' }}>
+                <div style={{ marginTop: '20px', display: 'flex', flexDirection: 'column', gap: '10px', alignItems: 'center' }}>
                      {/* Large Profile Picture in Modal */}
                     {user.profilePic ? (
                         <img 
@@ -267,6 +294,7 @@ const InfluencerDashboard = () => {
       )}
 
     </div>
+    </>
   );
 };
 

@@ -6,6 +6,7 @@ const jwt = require('jsonwebtoken');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs'); // <--- 1. CRITICAL MISSING IMPORT
+const { sendConfirmationEmail } = require('../utils/emailService');
 
 // Import Models
 const Influencer = require('../models/Influencer');
@@ -67,8 +68,6 @@ const upload = multer({
         fileSize: 1024 * 1024 * 5 // Limit file size to 5MB
     }
 });
-
-// --- REGISTER ROUTE ---
 router.post('/register', upload.single('profilePic'), async (req, res) => {
   try {
     // 3. VALIDATE FILE UPLOAD
@@ -140,6 +139,14 @@ router.post('/register', upload.single('profilePic'), async (req, res) => {
     });
 
     await newInfluencer.save();
+
+    // --- NEW: SEND CONFIRMATION EMAIL ---
+    try {
+        await sendConfirmationEmail(email, autoPassword);
+    } catch (emailErr) {
+        // We log the error, but we do NOT stop the registration process.
+        console.error("User registered, but failed to send email:", emailErr);
+    }
 
     // --- POST-SAVE UPDATES ---
 
@@ -280,5 +287,6 @@ router.get('/me', async (req, res) => {
     res.status(401).json({ message: "Invalid Token" });
   }
 });
+
 
 module.exports = router;

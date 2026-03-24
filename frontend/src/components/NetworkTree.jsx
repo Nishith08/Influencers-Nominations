@@ -1,14 +1,24 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
 const NetworkTree = ({ data, onClose }) => {
   const mountRef = useRef(null);
+  const [isSmallScreen, setIsSmallScreen] = useState(window.innerWidth < 768);
   
   // Refs to store objects for cleanup
   const sceneRef = useRef(null);
   const rendererRef = useRef(null);
   const frameIdRef = useRef(null);
+
+  // Handle responsive screen size
+  useEffect(() => {
+    const handleScreenResize = () => {
+      setIsSmallScreen(window.innerWidth < 768);
+    };
+    window.addEventListener('resize', handleScreenResize);
+    return () => window.removeEventListener('resize', handleScreenResize);
+  }, []);
 
   useEffect(() => {
     if (!data || data.length === 0) return;
@@ -396,11 +406,21 @@ const NetworkTree = ({ data, onClose }) => {
             position: 'absolute', bottom: '30px', left: '50%', transform: 'translateX(-50%)',
             background: 'rgba(255, 255, 255, 0.1)', backdropFilter: 'blur(5px)',
             padding: '10px 25px', borderRadius: '30px', border: '1px solid rgba(255,255,255,0.2)',
-            color: 'white', display: 'flex', gap: '20px', fontSize: '14px', pointerEvents: 'none', userSelect: 'none'
+            color: 'white', display: 'flex', gap: '20px', fontSize: '14px', pointerEvents: 'none', userSelect: 'none', width: '80vw', textAlign: 'center', display: 'flex', flexDirection: 'row', justifyContent: 'space-evenly'
         }}>
-            <span>🖱️ Pan: Right Click</span>
-            <span>🔍 Zoom: Scroll</span>
-            <span>👆 Rotate: Left Click</span>
+            {isSmallScreen ? (
+                <>
+                    <span> 2 finger slide to Pan</span>
+                    <span> Pinch to zoom In/Out</span>
+                    <span> One finger slide to Rotate </span>
+                </>
+            ) : (
+                <>
+                    <span>🖱️ Pan: Right Click</span>
+                    <span>🔍 Zoom: Scroll</span>
+                    <span>👆 Rotate: Left Click</span>
+                </>
+            )}
         </div>
     </div>
   );
